@@ -2,10 +2,12 @@ import express from "express";
 import { handlerReadiness } from "./api/readiness";
 import { errorMiddleware } from "./api/middleware/error-middleware";
 import { handlerAddPage } from "./api/pages";
+import { loggingMiddleware } from "./api/middleware/logging-middleware";
 
 const app = express();
 const PORT = 8080;
  
+app.use(loggingMiddleware);
 app.use(express.json());
 
 app.get("/api/readiness", async (req, res, next) => {

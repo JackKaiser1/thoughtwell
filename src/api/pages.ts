@@ -12,7 +12,7 @@ export async function handlerAddPage(req: Request, res: Response) {
     res.status(200).json({ note: note });
 }
 
-function validatePageData(data: PageObj, limit: number) {
+export function validatePageData(data: PageObj, limit: number) {
     const note = data.note;
     if (!note) {
         throw new BadRequestError("invalid json - page must have note");

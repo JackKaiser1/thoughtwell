@@ -15,6 +15,12 @@ export async function errorMiddleware(err: Error, req: Request, res: Response, n
         res.status(404).json({ error: err.message });
     }
     else {
-        res.status(500).json({ error: "Something went wrong" });
+        if (err.message.includes("JSON")) {
+            res.status(400).json({ error: err.message });
+        }
+        else {
+            res.status(500).json({ error: "Something went wrong" });
+            console.log(`Error: ${err.message}, Cause: ${err.cause}`);
+        }
     }
 }
