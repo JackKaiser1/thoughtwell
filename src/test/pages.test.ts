@@ -1,6 +1,6 @@
 import { expect, test, describe, it } from "vitest"
-import { validatePageData } from "../api/pages";
-import { BadRequestError } from "../api/errors";
+import { validatePageData } from "../api/pages.js";
+import { BadRequestError } from "../api/errors.js";
 
 
 describe("validatePageData", () => {

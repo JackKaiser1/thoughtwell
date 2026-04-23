@@ -1,8 +1,16 @@
 import express from "express";
-import { handlerReadiness } from "./api/readiness";
-import { errorMiddleware } from "./api/middleware/error-middleware";
-import { handlerAddPage } from "./api/pages";
-import { loggingMiddleware } from "./api/middleware/logging-middleware";
+import { handlerReadiness } from "./api/readiness.js";
+import { errorMiddleware } from "./api/middleware/error-middleware.js";
+import { handlerAddPage } from "./api/pages.js";
+import { loggingMiddleware } from "./api/middleware/logging-middleware.js";
+import postgres from "postgres";
+import { config } from "./config.js";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
+
+// const migrationConn = postgres(config.dbURL, { max: 1 });
+// await migrate(drizzle(migrationConn), config.migrationConfig);
+
 
 const app = express();
 const PORT = 8080;

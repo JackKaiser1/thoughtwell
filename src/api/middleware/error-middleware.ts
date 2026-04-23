@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError } from "../errors";
+import { BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError } from "../errors.js";
 
 export async function errorMiddleware(err: Error, req: Request, res: Response, next: NextFunction) {
     if (err instanceof BadRequestError) {

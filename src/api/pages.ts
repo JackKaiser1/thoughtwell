@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { BadRequestError } from "./errors";
-import { CharacterLimit } from "./api-constants";
+import { BadRequestError } from "./errors.js";
+import { CharacterLimit } from "./api-constants.js";
 
 type PageObj = {
     note: string;
