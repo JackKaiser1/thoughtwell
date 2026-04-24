@@ -9,12 +9,12 @@ export async function processPassword(password: string) {
     return hash;
 }
 
-function checkPasswordEntropy(password: string): void {
+export function checkPasswordEntropy(password: string): boolean {
     const length = password.length;
     if (length < PasswordCharMin) {
         throw new BadRequestError("Password is too short");
     }
-    return;
+    return true;
 }
 
 
@@ -28,15 +28,15 @@ export async function hashPassword(password: string): Promise<string> {
     }
 }
 
-export async function verifyHash(hash: string, password: string): Promise<void> {
+export async function verifyHash(hash: string, password: string): Promise<boolean> {
     try {
         if (await argon2.verify(hash, password)) {
-            return;
+            return true;
         } else {
             throw new UnauthorizedError("Incorrect password");
         }
     } catch (err) {
         console.log("Hashing failed");
-        throw new Error("Internal failure");
+        throw new UnauthorizedError("Incorrect password");
     }
 }
