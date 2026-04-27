@@ -3,6 +3,7 @@ import { processPassword } from "./auth/password.js";
 import { Request, Response } from "express";
 import { verifyUserData } from "../lib/verify-user.js";
 import { UserRecord } from "../db/schema.js";
+import { type dbClient, db } from "../db/index.js";
 
 export async function handlerCreateUser(req: Request, res: Response) {
     const user = verifyUserData(req.body);
@@ -13,7 +14,7 @@ export async function handlerCreateUser(req: Request, res: Response) {
         hashedPassword: hashedPassword,
     }
 
-    const userRecord = await createUser(newUser);
+    const userRecord = await createUser<dbClient>(db, newUser);
     if (!userRecord) {
         throw new Error("Query failed");
     }

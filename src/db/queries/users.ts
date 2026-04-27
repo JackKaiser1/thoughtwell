@@ -1,11 +1,30 @@
 import { type UserRecord, users } from "../schema.js";
-import { db } from "../index.js";
+import { type dbClient, db } from "../index.js";
+import { eq } from "drizzle-orm";
 
-export async function createUser(user: UserRecord) {
-    const [userObj] = await db
+export async function createUser<T extends dbClient>(client: T, user: UserRecord) {
+    const [userObj] = await client
                                 .insert(users)
                                 .values(user)
                                 .onConflictDoNothing()
                                 .returning();
     return userObj;
+}
+
+export async function deleteUser<T extends dbClient>(client: T, userId: string) {
+    await db 
+            .delete(users)
+            .where(eq(users.id, userId));
+}
+
+export async function deleteAllUsers<T extends dbClient>(client: T) {
+    await db.delete(users);
+}
+
+export async function getUsers<T extends dbClient>(client: T) {
+    const usersArr = await db
+                        .select()
+                        .from(users);
+                
+    return usersArr;
 }
