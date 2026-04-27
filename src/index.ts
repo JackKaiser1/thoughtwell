@@ -9,7 +9,7 @@ import { config } from "./config.js";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 
-import { handlerCreateUser } from "./api/create-user-handler.js";
+import { handlerCreateUser } from "./api/create-user.js";
 
 // const migrationConn = postgres(config.dbURL, { max: 1 });
 // await migrate(drizzle(migrationConn), config.migrationConfig);
