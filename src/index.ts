@@ -15,7 +15,7 @@ import { handlerCreateUser } from "./api/create-user-handler.js";
 // await migrate(drizzle(migrationConn), config.migrationConfig);
 
 
-const app = express();
+export const app = express();
 const PORT = 8080;
  
 app.use(loggingMiddleware);
