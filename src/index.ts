@@ -12,6 +12,7 @@ import { migrate } from "drizzle-orm/node-postgres/migrator";
 
 import { handlerCreateUser } from "./api/create-user.js";
 import { handlerDeleteUsers } from "./api/delete.js";
+import { handlerPrintUsers } from "./api/get-users.js";
 
 // const migrationConn = postgres(config.dbURL, { max: 1 });
 // await migrate(drizzle(migrationConn), config.migrationConfig);
@@ -37,6 +38,10 @@ app.post("/api/users", async (req, res, next) => {
 
 app.delete("/api/users", async (req, res, next) => {
     Promise.resolve(await handlerDeleteUsers(req, res)).catch(next);
+});
+
+app.get("/api/users", async (req, res, next) => {
+    Promise.resolve(await handlerPrintUsers(req, res)).catch(next);
 });
 
 app.use(errorMiddleware);
