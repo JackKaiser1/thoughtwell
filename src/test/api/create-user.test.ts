@@ -4,6 +4,7 @@ import { app } from "../../index.js";
 import { UserRequestData } from "../../lib/verify-user";
 import { UserRecord } from "../../db/schema";
 import { deleteUser } from "../../db/queries/users";
+import { verifyHash } from "../../api/auth/password.js";
 
 describe("/api/users", () => {
     it("should create user record in db and return UserRecord", async () => {
@@ -25,11 +26,15 @@ describe("/api/users", () => {
             throw new Error("invalid userId");
         }
 
+        const isVerified = verifyHash(user.hashedPassword, payload.password);
+
         expect(response.status).toBe(201)
         expect(user.userName).toBe(payload.userName);
+        expect(isVerified).toBeTruthy;
         for (const property in user) {
             expect(property).toBeTruthy;
         }
+
         await deleteUser(userId);
     });
 
@@ -59,6 +64,7 @@ describe("/api/users", () => {
                             .set("Content-Type", "application/json");
 
         expect(responseCopy.status).toEqual(500);
+        
         await deleteUser(userId);
     });
 });
