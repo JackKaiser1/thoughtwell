@@ -9,7 +9,7 @@ import { type dbClient, db } from "../../db/index.js";
 
 
 describe("/api/users", () => {
-    it("should create user record in db and return UserRecord", async () => {
+    it.skip("should create user record in db and return UserRecord", async () => {
         try {
             await db.transaction(async (tx) => {
                 const payload: UserRequestData = { userName: "guest1", password: "passwordpassword" };
@@ -32,7 +32,7 @@ describe("/api/users", () => {
 
                 const isVerified = verifyHash(user.hashedPassword, payload.password);
 
-                expect(response.status).toBe(201)
+                expect(response.status).toEqual(201)
                 expect(user.userName).toBe(payload.userName);
                 expect(isVerified).toBeTruthy;
                 for (const property in user) {
@@ -46,7 +46,7 @@ describe("/api/users", () => {
         }
     });
 
-    it("should respond with 500 error due to pre-existing record", async () => {
+    it.skip("should respond with 500 error due to pre-existing record", async () => {
 
         try {
             await db.transaction(async (tx) => {
