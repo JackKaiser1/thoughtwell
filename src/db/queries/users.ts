@@ -12,19 +12,28 @@ export async function createUser<T extends dbClient>(client: T, user: UserRecord
 }
 
 export async function deleteUser<T extends dbClient>(client: T, userId: string) {
-    await db 
+    await client 
             .delete(users)
             .where(eq(users.id, userId));
 }
 
 export async function deleteAllUsers<T extends dbClient>(client: T) {
-    await db.delete(users);
+    await client.delete(users);
 }
 
 export async function getUsers<T extends dbClient>(client: T) {
-    const usersArr = await db
+    const usersArr = await client
                         .select()
                         .from(users);
                 
     return usersArr;
+}
+
+export async function getUser<T extends dbClient>(client: T, userId: string) {
+    const [user] = await client
+                            .select()
+                            .from(users)
+                            .where(eq(users.id, userId));
+
+    return user;
 }
