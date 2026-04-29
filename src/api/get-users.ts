@@ -5,7 +5,7 @@ import { NotFoundError } from "./errors.js";
 import { type dbClient, db } from "../db/index.js";
 
 
-export async function handlerPrintUsers(req: Request, res: Response): Promise<void> {
+export async function handlerGetUsers(req: Request, res: Response): Promise<void> {
     const users: UserRecord[] = await getUsers<dbClient>(db);
     if (!users) {
         throw new NotFoundError("Users not found");
