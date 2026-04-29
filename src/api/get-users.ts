@@ -34,9 +34,9 @@ export async function handlerGetUser(req: Request, res: Response): Promise<void>
         throw new BadRequestError("user id must be string");
     }
 
-    const verifiedUserId = verifyUUID(userId);
+    verifyUUID(userId);
 
-    const user: UserRecord = await getUser<typeof db>(db, verifiedUserId);
+    const user: UserRecord = await getUser<typeof db>(db, userId);
     if (!user) {
         throw new NotFoundError("user not found");
     }

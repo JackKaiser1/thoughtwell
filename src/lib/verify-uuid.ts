@@ -1,12 +1,12 @@
 import e from "express";
 import { BadRequestError } from "../api/errors.js";
 
-export function verifyUUID(uuid: string): string {
+export function verifyUUID(uuid: string): void {
     const hexChars = "0123456789abcdef";
 
     const splitUUID = uuid.split("-");
     if (splitUUID.length !== 5) {
-        throw new BadRequestError("invalid uuid");
+        throw new BadRequestError("invalid uuid: must have 5 sections delimited by '-'");
     }
 
     let partNum = 1;
@@ -30,17 +30,15 @@ export function verifyUUID(uuid: string): string {
         }
 
         if (errCode === 1) {
-            throw new BadRequestError("invalid uuid");
+            throw new BadRequestError("invalid uuid: must follow 8-4-4-4-12 pattern");
         }
 
         for (const char of part) {
             if (!hexChars.includes(char)) {
-                throw new BadRequestError("invalid uuid");
+                throw new BadRequestError("invalid uuid: each section of uuid must only include hexadecimal values");
             }
         }
 
         partNum++;
     }
-
-    return uuid; 
 }
