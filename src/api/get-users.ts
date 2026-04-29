@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { getUsers } from "../db/queries/users.js";
+import { getUsers, getUser } from "../db/queries/users.js";
 import { UserRecord } from "../db/schema.js";
-import { NotFoundError } from "./errors.js";
+import { BadRequestError, NotFoundError } from "./errors.js";
 import { type dbClient, db } from "../db/index.js";
-
+import { verifyUUID } from "../lib/verify-uuid.js";
 
 export async function handlerGetUsers(req: Request, res: Response): Promise<void> {
     const users: UserRecord[] = await getUsers<dbClient>(db);
@@ -24,4 +24,22 @@ export async function handlerGetUsers(req: Request, res: Response): Promise<void
     console.log("--");
 
     res.status(200).send({ users: users});
+}
+
+export async function handlerGetUser(req: Request, res: Response): Promise<void> {
+    const userId = req.params.userId;
+    if (!userId) {
+        throw new BadRequestError("must provide user id as path parameter");
+    } else if (typeof userId !== "string") {
+        throw new BadRequestError("user id must be string");
+    }
+
+    const verifiedUserId = verifyUUID(userId);
+
+    const user: UserRecord = await getUser<typeof db>(db, verifiedUserId);
+    if (!user) {
+        throw new NotFoundError("user not found");
+    }
+
+    res.status(200).json(user);
 }
