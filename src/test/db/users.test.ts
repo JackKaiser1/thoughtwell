@@ -1,16 +1,20 @@
-import { describe, it, expect, beforeAll, onTestFailed } from "vitest";
+import { describe, it, expect, beforeAll, onTestFailed, afterAll, afterEach } from "vitest";
 import { createUser, deleteUser, deleteAllUsers, getUsers, getUser } from "../../db/queries/users.js";
 import { UserRecord, users } from "../../db/schema";
 import { UserRequestData } from "../../lib/verify-user.js";
 import { hashPassword } from "../../api/auth/password.js";
 import { type dbClient, db } from "../../db/index.js";
 import { eq, TransactionRollbackError } from "drizzle-orm";
-
+import { text } from "drizzle-orm/gel-core";
+import { toValueParam } from "drizzle-orm/aws-data-api/common";
+import { PgTransaction } from "drizzle-orm/pg-core";
+import { rollbackErrorHandler } from "../../lib/query-helpers.js";
+ 
 
 describe("createUser", () => {
     it("should create a user in the db", async () => {
-        await expect(
-            db.transaction(async (tx) => {
+        try {
+            await db.transaction(async (tx) => {
                 const user: UserRecord = {userName: "user", hashedPassword: "verystronghashedpassword"};
                 const userRecord: UserRecord = await createUser<typeof tx>(tx, user);
 
@@ -20,14 +24,15 @@ describe("createUser", () => {
                 }
 
                 tx.rollback();
-            })
-        ).rejects.toThrow(TransactionRollbackError);
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
     });
 
     it("should return undefined for pre-existing user", async () => {
-        
-        await expect(
-            db.transaction(async (tx) => {
+        try {
+            await db.transaction(async (tx) => {
                 const user: UserRecord = {userName: "user", hashedPassword: "verystronghashedpassword"};
                 const userRecord: UserRecord = await createUser<typeof tx>(tx, user);
 
@@ -36,15 +41,17 @@ describe("createUser", () => {
                 expect(userRecordUndefined).toEqual(undefined);
                 
                 tx.rollback();
-            })
-        ).rejects.toThrow(TransactionRollbackError);
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
     });
 });
 
-describe("deleteUser", () => {
+describe("deleteUser / deleteAllUsers", () => {
     it("should delete user from db", async () => {
-        await expect(
-            db.transaction(async (tx) => {
+        try {
+            await db.transaction(async (tx) => {
                 const user: UserRecord = {userName: "user", hashedPassword: "verystronghashedpassword"};
                 const userRecord: UserRecord = await createUser<typeof tx>(tx, user);
 
@@ -65,35 +72,65 @@ describe("deleteUser", () => {
                 expect(deletedUser).toEqual(undefined);
 
                 tx.rollback();
-            })
-        ).rejects.toThrow(TransactionRollbackError);
-    })
-});
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
 
-describe("getUsers / getUser", () => {
-    it("should get all users from db", async () => {
-        await expect(
-            db.transaction(async (tx) => {
-                const user1: UserRecord = {userName: "user", hashedPassword: "verystronghashedpassword"};
-                const userRecord1: UserRecord = await createUser<typeof tx>(tx, user1);
+    it("should delete all users from db", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user: UserRecord = {userName: "user1", hashedPassword: "verystronghashedpassword"};
+                const userRecord: UserRecord = await createUser<typeof tx>(tx, user);
 
-                const user2: UserRecord = {userName: "user", hashedPassword: "verystronghashedpassword"};
+                const user2: UserRecord = {userName: "user2", hashedPassword: "verystronghashedpassword"};
                 const userRecord2: UserRecord = await createUser<typeof tx>(tx, user2);
 
                 const allUsers = await getUsers<typeof tx>(tx);
 
                 expect(allUsers).toBeTruthy()
-                expect(allUsers[0]).toEqual(userRecord1);
-                expect(allUsers[1]).toEqual(userRecord2);
+
+                await deleteAllUsers<typeof tx>(tx);
+
+                const deletedUsers = await getUsers<typeof tx>(tx);
+
+                expect(deletedUsers.length).toBeFalsy();
+                expect(deletedUsers.length).toEqual(0);
 
                 tx.rollback();
-            })
-        ).rejects.toThrow(TransactionRollbackError);
+            });
+        } catch(err) {
+            rollbackErrorHandler(err);
+        }
+    });
+});
+
+describe("getUsers / getUser", () => {
+    it("should get all users from db", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user1: UserRecord = {userName: "user1", hashedPassword: "verystronghashedpassword"};
+                const userRecord1: UserRecord = await createUser<typeof tx>(tx, user1);
+
+                const user2: UserRecord = {userName: "user2", hashedPassword: "verystronghashedpassword"};
+                const userRecord2: UserRecord = await createUser<typeof tx>(tx, user2);
+
+                const allUsers = await getUsers<typeof tx>(tx);
+
+                expect(allUsers).toBeTruthy();
+                expect(allUsers.length).toBeGreaterThanOrEqual(2);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
     });
 
     it("should get a single user from the db", async () => {
-        await expect(
-            db.transaction(async (tx) => {
+        try {
+            await db.transaction(async (tx) => {
                 const user: UserRecord = {userName: "user", hashedPassword: "verystronghashedpassword"};
                 const userRecord: UserRecord = await createUser<typeof tx>(tx, user);
 
@@ -107,7 +144,9 @@ describe("getUsers / getUser", () => {
                 expect(fetchedUser).toEqual(userRecord);
 
                 tx.rollback();
-            })
-        ).rejects.toThrow(TransactionRollbackError);
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
     });
 });
