@@ -11,7 +11,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 
 import { handlerCreateUser } from "./api/create-user.js";
-import { handlerDeleteUsers } from "./api/delete.js";
+import { handlerDeleteUsers, handlerDeleteUser } from "./api/delete.js";
 import { handlerGetUsers, handlerGetUser } from "./api/get-users.js";
 
 // const migrationConn = postgres(config.dbURL, { max: 1 });
@@ -38,6 +38,10 @@ app.post("/api/users", async (req, res, next) => {
 
 app.delete("/api/users", async (req, res, next) => {
     Promise.resolve(await handlerDeleteUsers(req, res)).catch(next);
+});
+
+app.delete("/api/users/:userId", async (req, res, next) => {
+    Promise.resolve(await handlerDeleteUser(req, res)).catch(next);
 });
 
 app.get("/api/users", async (req, res, next) => {
