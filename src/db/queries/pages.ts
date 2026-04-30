@@ -2,7 +2,7 @@ import { type PageRecord, pages, users } from "../schema.js";
 import { type dbClient, db} from "../index.js";
 import { eq } from "drizzle-orm";
 
-type PageQuery = Omit<PageRecord, "createdAt" | "updatedAt" | "id" | "isChild">;
+export type PageQuery = Omit<PageRecord, "createdAt" | "updatedAt" | "id" | "isChild">;
 
 export async function createPage(client: dbClient, page: PageQuery) {
     const [pageRecord] = await client 

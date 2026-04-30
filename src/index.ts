@@ -1,13 +1,12 @@
 import express from "express";
 import { handlerReadiness } from "./api/readiness.js";
 import { errorMiddleware } from "./api/middleware/error-middleware.js";
-import { handlerAddPage } from "./api/pages.js";
 import { loggingMiddleware } from "./api/middleware/logging-middleware.js";
 import { handlerCreateUser } from "./api/create-user.js";
 import { handlerDeleteUsers, handlerDeleteUser } from "./api/delete.js";
 import { handlerGetUsers, handlerGetUser } from "./api/get-users.js";
 import { handlerLogin } from "./api/login.js";
-
+import { handlerCreatePage } from "./api/create-page.js";
 
 export const app = express();
 const PORT = 8080;
@@ -20,7 +19,7 @@ app.get("/api/readiness", async (req, res, next) => {
 });
 
 app.post("/api/pages", async (req, res, next) => {
-    Promise.resolve(await handlerAddPage(req, res)).catch(next);
+    Promise.resolve(await handlerCreatePage(req, res)).catch(next);
 });
 
 app.post("/api/users", async (req, res, next) => {
