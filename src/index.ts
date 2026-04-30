@@ -3,19 +3,10 @@ import { handlerReadiness } from "./api/readiness.js";
 import { errorMiddleware } from "./api/middleware/error-middleware.js";
 import { handlerAddPage } from "./api/pages.js";
 import { loggingMiddleware } from "./api/middleware/logging-middleware.js";
-
-
-import postgres from "postgres";
-import { config } from "./config.js";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { migrate } from "drizzle-orm/node-postgres/migrator";
-
 import { handlerCreateUser } from "./api/create-user.js";
 import { handlerDeleteUsers, handlerDeleteUser } from "./api/delete.js";
 import { handlerGetUsers, handlerGetUser } from "./api/get-users.js";
-
-// const migrationConn = postgres(config.dbURL, { max: 1 });
-// await migrate(drizzle(migrationConn), config.migrationConfig);
+import { handlerLogin } from "./api/login.js";
 
 
 export const app = express();
@@ -50,6 +41,10 @@ app.get("/api/users", async (req, res, next) => {
 
 app.get("/api/users/:userId", async (req, res, next) => {
     Promise.resolve(await handlerGetUser(req, res)).catch(next);
+});
+
+app.post("/api/login", async (req, res, next) => {
+    Promise.resolve(await handlerLogin(req, res)).catch(next);
 });
 
 app.use(errorMiddleware);
