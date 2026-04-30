@@ -1,2 +1,2 @@
-export const CharacterLimit = 140;
+export const CharacterLimit = 3_000;
 export const PasswordCharMin = 16;
