@@ -7,6 +7,7 @@ import { handlerDeleteUsers, handlerDeleteUser } from "./api/delete.js";
 import { handlerGetUsers, handlerGetUser } from "./api/get-users.js";
 import { handlerLogin } from "./api/login.js";
 import { handlerCreatePage } from "./api/create-page.js";
+import { handlerGetPages } from "./api/get-pages.js";
 
 export const app = express();
 const PORT = 8080;
@@ -20,6 +21,10 @@ app.get("/api/readiness", async (req, res, next) => {
 
 app.post("/api/pages", async (req, res, next) => {
     Promise.resolve(await handlerCreatePage(req, res)).catch(next);
+});
+
+app.get("/api/pages", async (req, res, next) => {
+    Promise.resolve(await handlerGetPages(req, res)).catch(next);
 });
 
 app.post("/api/users", async (req, res, next) => {
