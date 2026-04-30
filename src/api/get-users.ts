@@ -6,7 +6,7 @@ import { type dbClient, db } from "../db/index.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
 
 export async function handlerGetUsers(req: Request, res: Response): Promise<void> {
-    const users: UserRecord[] = await getUsers<dbClient>(db);
+    const users: UserRecord[] = await getUsers(db);
     if (!users) {
         throw new NotFoundError("Users not found");
     }
@@ -36,7 +36,7 @@ export async function handlerGetUser(req: Request, res: Response): Promise<void>
 
     verifyUUID(userId);
 
-    const user: UserRecord = await getUser<typeof db>(db, userId);
+    const user: UserRecord = await getUser(db, userId);
     if (!user) {
         throw new NotFoundError("user not found");
     }

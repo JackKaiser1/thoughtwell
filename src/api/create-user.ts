@@ -14,7 +14,7 @@ export async function handlerCreateUser(req: Request, res: Response) {
         hashedPassword: hashedPassword,
     }
 
-    const userRecord = await createUser<dbClient>(db, newUser);
+    const userRecord = await createUser(db, newUser);
     if (!userRecord) {
         throw new Error("Query failed");
     }

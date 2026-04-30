@@ -2,7 +2,7 @@ import { type UserRecord, users } from "../schema.js";
 import { type dbClient, db } from "../index.js";
 import { eq } from "drizzle-orm";
 
-export async function createUser<T extends dbClient>(client: T, user: UserRecord) {
+export async function createUser(client: dbClient, user: UserRecord) {
     const [userObj] = await client
                                 .insert(users)
                                 .values(user)
@@ -11,17 +11,17 @@ export async function createUser<T extends dbClient>(client: T, user: UserRecord
     return userObj;
 }
 
-export async function deleteUser<T extends dbClient>(client: T, userId: string) {
+export async function deleteUser(client: dbClient, userId: string) {
     await client 
             .delete(users)
             .where(eq(users.id, userId));
 }
 
-export async function deleteAllUsers<T extends dbClient>(client: T) {
+export async function deleteAllUsers(client: dbClient) {
     await client.delete(users);
 }
 
-export async function getUsers<T extends dbClient>(client: T) {
+export async function getUsers(client: dbClient) {
     const usersArr = await client
                         .select()
                         .from(users);
@@ -29,7 +29,7 @@ export async function getUsers<T extends dbClient>(client: T) {
     return usersArr;
 }
 
-export async function getUser<T extends dbClient>(client: T, userId: string) {
+export async function getUser(client: dbClient, userId: string) {
     const [user] = await client
                             .select()
                             .from(users)
@@ -37,3 +37,7 @@ export async function getUser<T extends dbClient>(client: T, userId: string) {
 
     return user;
 }
+
+// export async function getUserFromUsername(client: dbClient, userId: string) {
+    
+// }

@@ -16,7 +16,7 @@ describe("createUser", () => {
         try {
             await db.transaction(async (tx) => {
                 const user: UserRecord = {userName: "user", hashedPassword: "verystronghashedpassword"};
-                const userRecord: UserRecord = await createUser<typeof tx>(tx, user);
+                const userRecord: UserRecord = await createUser(tx, user);
 
                 expect(userRecord.userName).toEqual(user.userName);
                 for (const prop in userRecord) {
@@ -34,9 +34,9 @@ describe("createUser", () => {
         try {
             await db.transaction(async (tx) => {
                 const user: UserRecord = {userName: "user", hashedPassword: "verystronghashedpassword"};
-                const userRecord: UserRecord = await createUser<typeof tx>(tx, user);
+                const userRecord: UserRecord = await createUser(tx, user);
 
-                const userRecordUndefined: UserRecord = await createUser<typeof tx>(tx, user);
+                const userRecordUndefined: UserRecord = await createUser(tx, user);
 
                 expect(userRecordUndefined).toEqual(undefined);
                 
@@ -53,7 +53,7 @@ describe("deleteUser / deleteAllUsers", () => {
         try {
             await db.transaction(async (tx) => {
                 const user: UserRecord = {userName: "user", hashedPassword: "verystronghashedpassword"};
-                const userRecord: UserRecord = await createUser<typeof tx>(tx, user);
+                const userRecord: UserRecord = await createUser(tx, user);
 
                 expect(userRecord.userName).toEqual(user.userName);
                 for (const prop in userRecord) {
@@ -65,9 +65,9 @@ describe("deleteUser / deleteAllUsers", () => {
                     throw new Error("invalid user id");
                 }
 
-                await deleteUser<typeof tx>(tx, userId);
+                await deleteUser(tx, userId);
 
-                const deletedUser = await getUser<typeof tx>(tx, userId);
+                const deletedUser = await getUser(tx, userId);
 
                 expect(deletedUser).toEqual(undefined);
 
@@ -82,18 +82,18 @@ describe("deleteUser / deleteAllUsers", () => {
         try {
             await db.transaction(async (tx) => {
                 const user: UserRecord = {userName: "user1", hashedPassword: "verystronghashedpassword"};
-                const userRecord: UserRecord = await createUser<typeof tx>(tx, user);
+                const userRecord: UserRecord = await createUser(tx, user);
 
                 const user2: UserRecord = {userName: "user2", hashedPassword: "verystronghashedpassword"};
-                const userRecord2: UserRecord = await createUser<typeof tx>(tx, user2);
+                const userRecord2: UserRecord = await createUser(tx, user2);
 
-                const allUsers = await getUsers<typeof tx>(tx);
+                const allUsers = await getUsers(tx);
 
                 expect(allUsers).toBeTruthy()
 
-                await deleteAllUsers<typeof tx>(tx);
+                await deleteAllUsers(tx);
 
-                const deletedUsers = await getUsers<typeof tx>(tx);
+                const deletedUsers = await getUsers(tx);
 
                 expect(deletedUsers.length).toBeFalsy();
                 expect(deletedUsers.length).toEqual(0);
@@ -111,12 +111,12 @@ describe("getUsers / getUser", () => {
         try {
             await db.transaction(async (tx) => {
                 const user1: UserRecord = {userName: "user1", hashedPassword: "verystronghashedpassword"};
-                const userRecord1: UserRecord = await createUser<typeof tx>(tx, user1);
+                const userRecord1: UserRecord = await createUser(tx, user1);
 
                 const user2: UserRecord = {userName: "user2", hashedPassword: "verystronghashedpassword"};
-                const userRecord2: UserRecord = await createUser<typeof tx>(tx, user2);
+                const userRecord2: UserRecord = await createUser(tx, user2);
 
-                const allUsers = await getUsers<typeof tx>(tx);
+                const allUsers = await getUsers(tx);
 
                 expect(allUsers).toBeTruthy();
                 expect(allUsers.length).toBeGreaterThanOrEqual(2);
@@ -132,14 +132,14 @@ describe("getUsers / getUser", () => {
         try {
             await db.transaction(async (tx) => {
                 const user: UserRecord = {userName: "user", hashedPassword: "verystronghashedpassword"};
-                const userRecord: UserRecord = await createUser<typeof tx>(tx, user);
+                const userRecord: UserRecord = await createUser(tx, user);
 
                 const userId = userRecord.id;
                 if (!userId) {
                     throw new Error("invalid user id");
                 }
 
-                const fetchedUser = await getUser<typeof tx>(tx, userId);
+                const fetchedUser = await getUser(tx, userId);
 
                 expect(fetchedUser).toEqual(userRecord);
 
