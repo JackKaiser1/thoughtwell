@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, onTestFailed, afterAll, afterEach } from "vitest";
-import { createUser, deleteUser, deleteAllUsers, getUsers, getUser } from "../../db/queries/users.js";
+import { createUser, deleteUser, deleteAllUsers, getUsers, getUser, getUserFromUsername } from "../../db/queries/users.js";
 import { UserRecord, users } from "../../db/schema";
 import { UserRequestData } from "../../lib/verify-user.js";
 import { hashPassword } from "../../api/auth/password.js";
@@ -106,7 +106,7 @@ describe("deleteUser / deleteAllUsers", () => {
     });
 });
 
-describe("getUsers / getUser", () => {
+describe("getUsers / getUser / getUserFromUsername", () => {
     it("should get all users from db", async () => {
         try {
             await db.transaction(async (tx) => {
@@ -142,6 +142,30 @@ describe("getUsers / getUser", () => {
                 const fetchedUser = await getUser(tx, userId);
 
                 expect(fetchedUser).toEqual(userRecord);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+
+    it("should get a user from username", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user: UserRecord = {userName: "user", hashedPassword: "verystronghashedpassword"};
+                const userRecord: UserRecord = await createUser(tx, user);
+
+                if (!userRecord) {
+                    throw new Error("createUser query failed");
+                }
+
+                const userName = userRecord.userName;
+
+                const fetchedUser = await getUserFromUsername(tx, userName);
+                
+                expect(fetchedUser).toBeTruthy();
+                expect(fetchedUser.userName).toEqual(userRecord.userName);
 
                 tx.rollback();
             });

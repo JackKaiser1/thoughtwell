@@ -38,6 +38,10 @@ export async function getUser(client: dbClient, userId: string) {
     return user;
 }
 
-// export async function getUserFromUsername(client: dbClient, userId: string) {
-    
-// }
+export async function getUserFromUsername(client: dbClient, userName: string) {
+    const [user] = await client 
+                            .select()
+                            .from(users)
+                            .where(eq(users.userName, userName));
+    return user;
+}
