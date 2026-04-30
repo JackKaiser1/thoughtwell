@@ -13,7 +13,8 @@ export const pages = pgTable("pages", {
     pageContent: varchar("page_content", { length: 3_500 }).notNull(),
     isChild: boolean("is_child").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow(),  
-    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date())
+    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" })
 });
 
 export type UserRecord = typeof users.$inferInsert;
