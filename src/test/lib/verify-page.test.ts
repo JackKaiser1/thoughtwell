@@ -3,7 +3,7 @@ import { verifyPageData } from "../../lib/verify-page.js";
 import { BadRequestError } from "../../api/errors.js";
 
 
-describe("validatePageData", () => {
+describe("verifyPageData", () => {
     it("should return abc", () => {
         expect(verifyPageData({ userName: "User", pageContent: "abc" }, 140)).toEqual({ userName: "User", pageContent: "abc" });
     });

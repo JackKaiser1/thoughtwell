@@ -17,5 +17,15 @@ export const pages = pgTable("pages", {
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" })
 });
 
+export const notebooks = pgTable("notebooks", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    notebookName: varchar("notebook_name", { length: 256 }).notNull(),
+    isChild: boolean("is_child").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" })
+});
+
 export type UserRecord = typeof users.$inferInsert;
 export type PageRecord = typeof pages.$inferInsert;
+export type NotebookRecord = typeof notebooks.$inferInsert;

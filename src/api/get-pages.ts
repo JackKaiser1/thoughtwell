@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getPages } from "../db/queries/pages.js";
+import { getPages, getPage } from "../db/queries/pages.js";
 import { BadRequestError, NotFoundError } from "./errors.js";
 import { db } from "../db/index.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
@@ -20,4 +20,22 @@ export async function handlerGetPages(req: Request, res: Response) {
     }
 
     res.status(200).json(pageRecords);
+}
+
+export async function handlerGetPage(req: Request, res: Response) {
+    const pageId = req.params.pageId;
+    if (!pageId) {
+        throw new BadRequestError("must provide page id as path parameter");
+    } else if (typeof pageId !== "string") {
+        throw new BadRequestError("pageId parameter must be string");
+    }
+
+    verifyUUID(pageId);
+
+    const pageRecord = await getPage(db, pageId);
+    if (!pageRecord) {
+        throw new NotFoundError("page not found");
+    }
+
+    res.status(200).json(pageRecord);
 }
