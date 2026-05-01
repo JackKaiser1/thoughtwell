@@ -3,11 +3,12 @@ import { handlerReadiness } from "./api/readiness.js";
 import { errorMiddleware } from "./api/middleware/error-middleware.js";
 import { loggingMiddleware } from "./api/middleware/logging-middleware.js";
 import { handlerCreateUser } from "./api/create-user.js";
-import { handlerDeleteUsers, handlerDeleteUser } from "./api/delete.js";
+import { handlerDeleteUsers, handlerDeleteUser } from "./api/delete-user.js";
 import { handlerGetUsers, handlerGetUser } from "./api/get-users.js";
 import { handlerLogin } from "./api/login.js";
 import { handlerCreatePage } from "./api/create-page.js";
 import { handlerGetPage, handlerGetPages } from "./api/get-pages.js";
+import { handlerDeletePage } from "./api/delete-page.js";
 
 export const app = express();
 const PORT = 8080;
@@ -19,6 +20,8 @@ app.get("/api/readiness", async (req, res, next) => {
     Promise.resolve(await handlerReadiness(req, res)).catch(next);
 });
 
+
+// pages
 app.post("/api/pages", async (req, res, next) => {
     Promise.resolve(await handlerCreatePage(req, res)).catch(next);
 });
@@ -31,6 +34,12 @@ app.get("/api/pages", async (req, res, next) => {
     Promise.resolve(await handlerGetPages(req, res)).catch(next);
 });
 
+app.delete("/api/pages/:pageId", async (req, res, next) => {
+    Promise.resolve(await handlerDeletePage(req, res)).catch(next);
+});
+
+
+// users
 app.post("/api/users", async (req, res, next) => {
     Promise.resolve(await handlerCreateUser(req, res)).catch(next);
 });
