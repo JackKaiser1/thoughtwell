@@ -10,6 +10,7 @@ import { handlerCreatePage } from "./api/create-page.js";
 import { handlerGetPage, handlerGetPages } from "./api/get-pages.js";
 import { handlerDeletePage } from "./api/delete-page.js";
 import { handlerCreateNotebook } from "./api/create-notebook.js";
+import { handlerGetNotebooks } from "./api/get-notebooks.js";
 
 export const app = express();
 const PORT = 8080;
@@ -69,6 +70,10 @@ app.post("/api/login", async (req, res, next) => {
 // notebooks
 app.post("/api/notebooks", async (req, res, next) => {
     Promise.resolve(await handlerCreateNotebook(req, res)).catch(next);
+});
+
+app.get("/api/notebooks", async (req, res, next) => {
+    Promise.resolve(await handlerGetNotebooks(req, res)).catch(next);
 });
 
 
