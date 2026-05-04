@@ -9,6 +9,10 @@ import { handlerLogin } from "./api/login.js";
 import { handlerCreatePage } from "./api/create-page.js";
 import { handlerGetPage, handlerGetPages } from "./api/get-pages.js";
 import { handlerDeletePage } from "./api/delete-page.js";
+import { handlerCreateNotebook } from "./api/create-notebook.js";
+import { handlerGetNotebooks } from "./api/get-notebooks.js";
+import { handlerAddPagesToNotebook } from "./api/add-pages-notebook.js";
+import { handlerGetPagesOfNotebook } from "./api/get-pages-from-notebook.js";
 
 export const app = express();
 const PORT = 8080;
@@ -63,6 +67,27 @@ app.get("/api/users/:userId", async (req, res, next) => {
 app.post("/api/login", async (req, res, next) => {
     Promise.resolve(await handlerLogin(req, res)).catch(next);
 });
+
+
+// notebooks
+app.post("/api/notebooks", async (req, res, next) => {
+    Promise.resolve(await handlerCreateNotebook(req, res)).catch(next);
+});
+
+app.get("/api/notebooks", async (req, res, next) => {
+    Promise.resolve(await handlerGetNotebooks(req, res)).catch(next);
+});
+
+app.post("/api/addPages", async (req, res, next) => {
+    Promise.resolve(await handlerAddPagesToNotebook(req, res)).catch(next);
+});
+
+app.get("/api/notebooks/:notebookId/pages", async (req, res, next) => {
+    Promise.resolve(await handlerGetPagesOfNotebook(req, res)).catch(next);
+});
+
+
+
 
 app.use(errorMiddleware);
 

@@ -1,7 +1,11 @@
 import e from "express";
 import { BadRequestError } from "../api/errors.js";
 
-export function verifyUUID(uuid: string): void {
+export function verifyUUID(uuid: unknown): string {
+    if (typeof uuid !== "string") {
+        throw new BadRequestError("UUID must be string");
+    }
+
     const hexChars = "0123456789abcdef";
 
     const splitUUID = uuid.split("-");
@@ -41,4 +45,6 @@ export function verifyUUID(uuid: string): void {
 
         partNum++;
     }
+
+    return uuid;
 }

@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, timestamp, boolean } from "drizzle-orm/pg-core"; 
+import { pgTable, uuid, varchar, timestamp, boolean, uniqueIndex } from "drizzle-orm/pg-core"; 
 
 export const users = pgTable("users", {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -26,6 +26,18 @@ export const notebooks = pgTable("notebooks", {
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" })
 });
 
+export const pagesToNotebooks = pgTable("pages_to_notebooks", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+    childPageId: uuid("child_page_id").notNull().references(() => pages.id, { onDelete: "cascade" }),
+    parentNotebookId: uuid("parent_notebook_id").notNull().references(() => notebooks.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" })
+},
+    (t) => [uniqueIndex("page_of_notebook").on(t.childPageId, t.parentNotebookId)]
+);
+
 export type UserRecord = typeof users.$inferInsert;
 export type PageRecord = typeof pages.$inferInsert;
 export type NotebookRecord = typeof notebooks.$inferInsert;
+export type PagesToNotebooksRecord = typeof pagesToNotebooks.$inferInsert;
