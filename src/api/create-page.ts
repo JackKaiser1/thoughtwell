@@ -4,7 +4,7 @@ import { getUserFromUsername } from "../db/queries/users.js";
 import { verifyPageData } from "../lib/verify-page.js";
 import { CharacterLimit } from "./api-constants.js";
 import { db } from "../db/index.js";
-import { UnauthorizedError } from "./errors.js";
+import { NotFoundError, UnauthorizedError } from "./errors.js";
 import { type PageRecord } from "../db/schema.js";
 
 export async function handlerCreatePage(req: Request, res: Response) {
@@ -13,7 +13,7 @@ export async function handlerCreatePage(req: Request, res: Response) {
     const userName = pageObj.userName;
     const userRecord = await getUserFromUsername(db, userName);
     if (!userRecord) {
-        throw new UnauthorizedError("User does not exist");
+        throw new NotFoundError("User not found");
     }
 
     const pageQuery: PageQuery = {
