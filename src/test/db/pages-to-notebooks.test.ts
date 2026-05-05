@@ -5,7 +5,8 @@ import { createPagesToNotebooks, getPageChildren } from "../../db/queries/pages-
 import { createUser } from "../../db/queries/users.js";
 import { createPage } from "../../db/queries/pages.js";
 import { createNotebook } from "../../db/queries/notebooks.js";
-import { PagesToNotebooksRecord } from "../../db/schema.js";
+import { notebooks, PagesToNotebooksRecord } from "../../db/schema.js";
+import { type PagesToAdd, pageToNotebookQuery } from "../../api/add-pages-notebook.js"
 
 describe("createPagesToNotebooks", () => {
     it("should create pagesToNoteBooks record in db", async () => {
@@ -82,6 +83,48 @@ describe("getPageChildren", () => {
                 const pagesToNoteBooksRecords = await getPageChildren(tx, notebookId);
 
                 expect(pagesToNoteBooksRecords.length).toBeGreaterThanOrEqual(3);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+});
+
+describe("pageToNotebookQuery", () => {
+    it("should add 3 pages to notebook", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;
+
+                const page = { pageContent: "1st note", userId: userId };
+                const pageRecord = await createPage(tx, page);
+
+                const page2 = { pageContent: "2nd note", userId: userId };
+                const pageRecord2 = await createPage(tx, page2);
+
+                const page3 = { pageContent: "3rd note", userId: userId };
+                const pageRecord3 = await createPage(tx, page3);
+
+                const notebook = { notebookName: "New Notebook", userId: userId };
+                const notebookRecord = await createNotebook(tx, notebook);
+                const notebookId = notebookRecord.id;
+
+                const pagesToAdd: PagesToAdd = {
+                    userId: userId,
+                    notebookId: notebookId,
+                    pageIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
+                }
+
+                const childParentRecords = await pageToNotebookQuery(tx, pagesToAdd);
+                
+                expect(childParentRecords.length).toEqual(pagesToAdd.pageIds.length);
+                expect(childParentRecords[0].childPageId).toEqual(pageRecord.id);
+                expect(childParentRecords[1].childPageId).toEqual(pageRecord2.id);
+                expect(childParentRecords[2].childPageId).toEqual(pageRecord3.id);
 
                 tx.rollback();
             });

@@ -7,7 +7,7 @@ import { handlerDeleteUsers, handlerDeleteUser } from "./api/delete-user.js";
 import { handlerGetUsers, handlerGetUser } from "./api/get-users.js";
 import { handlerLogin } from "./api/login.js";
 import { handlerCreatePage } from "./api/create-page.js";
-import { handlerGetPage, handlerGetPages } from "./api/get-pages.js";
+import { handlerGetPage, handlerGetPages, handlerGetLoosePages } from "./api/get-pages.js";
 import { handlerDeletePage } from "./api/delete-page.js";
 import { handlerCreateNotebook } from "./api/create-notebook.js";
 import { handlerGetNotebooks } from "./api/get-notebooks.js";
@@ -40,6 +40,10 @@ app.get("/api/pages", async (req, res, next) => {
 
 app.delete("/api/pages/:pageId", async (req, res, next) => {
     Promise.resolve(await handlerDeletePage(req, res)).catch(next);
+});
+
+app.get("/api/loosePages", async (req, res, next) => {
+    Promise.resolve(await handlerGetLoosePages(req, res)).catch(next);
 });
 
 
