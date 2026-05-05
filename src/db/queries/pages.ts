@@ -1,6 +1,6 @@
 import { type PageRecord, pages, users } from "../schema.js";
 import { type dbClient, db} from "../index.js";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export type PageQuery = Omit<PageRecord, "createdAt" | "updatedAt" | "id" | "isChild">;
 
@@ -42,4 +42,17 @@ export async function makeChildPage(client: dbClient, pageId: string) {
                                     .returning();
 
     return pageRecord;
+}
+
+export async function getLoosePages(client: dbClient, userId: string) {
+    const pageRecords = await client
+                                    .select()
+                                    .from(pages)
+                                    .where(
+                                        and(
+                                            eq(pages.userId, userId), 
+                                            eq(pages.isChild, false)
+                                        )
+                                    );
+    return pageRecords;
 }
