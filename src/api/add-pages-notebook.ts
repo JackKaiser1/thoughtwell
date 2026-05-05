@@ -3,7 +3,8 @@ import { BadRequestError } from "./errors.js";
 import { db } from "../db/index.js";
 import { createPagesToNotebooks } from "../db/queries/pages-to-notebooks.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
-import { type PagesToNotebooksRecord, pages } from "../db/schema.js";
+import { type PageRecord, type PagesToNotebooksRecord, pages } from "../db/schema.js";
+import { makeChildPage } from "../db/queries/pages.js";
 
 export type PagesToAdd = {
     pageIds: string[];
@@ -29,9 +30,23 @@ export async function handlerAddPagesToNotebook(req: Request, res: Response) {
         verifyUUID(pageId);
     }
 
+    const childParentRecords = await pageToNotebookQuery(pagesToAdd);
+    await makePageChildren(pagesToAdd.pageIds);
 
+    for (const element of childParentRecords) {
+        if (!element) {
+            throw new BadRequestError("attempted to create duplicate records");
+        }
+    }
+
+    res.status(201).json(childParentRecords);
+}
+
+async function pageToNotebookQuery(pagesToAdd: PagesToAdd): Promise<PagesToNotebooksRecord[]> {
     const queryPromises: Promise<PagesToNotebooksRecord>[] = [];
+
     for (const pageId of pagesToAdd.pageIds) {
+        
         const childParentQuery: PagesToNotebooksRecord = {
             userId: pagesToAdd.userId,
             parentNotebookId: pagesToAdd.notebookId,
@@ -41,9 +56,15 @@ export async function handlerAddPagesToNotebook(req: Request, res: Response) {
     }
 
     const pagesToNoteBooksRecords = await Promise.all(queryPromises);
-    if (!pagesToNoteBooksRecords) {
-        throw new Error("failed to add records to db");
+    return pagesToNoteBooksRecords;
+}
+
+async function makePageChildren(pageIds: string[]): Promise<void> {
+    const queryPromises: Promise<PageRecord>[] = [];
+
+    for (const pageid of pageIds) {
+        queryPromises.push(makeChildPage(db, pageid));
     }
 
-    res.status(201).json(pagesToNoteBooksRecords);
+    await Promise.all(queryPromises);
 }
