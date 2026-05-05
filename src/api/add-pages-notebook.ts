@@ -13,22 +13,8 @@ export type PagesToAdd = {
 }
 
 export async function handlerAddPagesToNotebook(req: Request, res: Response) {
-    const pagesToAdd: PagesToAdd = req.body;
-    if (!pagesToAdd) {
-        throw new BadRequestError("invalid request");
-    } else if (pagesToAdd.pageIds.length < 1) {
-        throw new BadRequestError("pageIds array must contain at least one page id");
-    } else if (!pagesToAdd.userId) {
-        throw new BadRequestError("payload must contain userId property");
-    } else if (!pagesToAdd.notebookId) {
-        throw new BadRequestError("payload must contain notebookId property");
-    }
-
-    verifyUUID(pagesToAdd.userId);
-    verifyUUID(pagesToAdd.notebookId);
-    for (const pageId of pagesToAdd.pageIds) {
-        verifyUUID(pageId);
-    }
+    const unverifiedPagesToAdd: PagesToAdd = req.body;
+    const pagesToAdd = verifyPagesToAdd(unverifiedPagesToAdd);
 
     const childParentRecords = await pageToNotebookQuery(db, pagesToAdd);
     await makePageChildren(db, pagesToAdd.pageIds);
@@ -42,6 +28,8 @@ export async function handlerAddPagesToNotebook(req: Request, res: Response) {
     res.status(201).json(childParentRecords);
 }
 
+
+// Function must be used after UUID verification
 export async function pageToNotebookQuery(client: dbClient, pagesToAdd: PagesToAdd): Promise<PagesToNotebooksRecord[]> {
     const queryPromises: Promise<PagesToNotebooksRecord>[] = [];
 
@@ -59,6 +47,7 @@ export async function pageToNotebookQuery(client: dbClient, pagesToAdd: PagesToA
     return pagesToNoteBooksRecords;
 }
 
+
 // Function must be used after UUID verification
 export async function makePageChildren(client: dbClient, pageIds: string[]): Promise<PageRecord[]> {
     const queryPromises: Promise<PageRecord>[] = [];
@@ -68,4 +57,31 @@ export async function makePageChildren(client: dbClient, pageIds: string[]): Pro
     }
 
     return await Promise.all(queryPromises);
+}
+
+
+export function verifyPagesToAdd(unverifiedPagesToAdd: PagesToAdd): PagesToAdd {
+    if (!unverifiedPagesToAdd) {
+        throw new BadRequestError("invalid request");
+    } else if (unverifiedPagesToAdd.pageIds.length < 1) {
+        throw new BadRequestError("pageIds array must contain at least one page id");
+    } else if (!unverifiedPagesToAdd.userId) {
+        throw new BadRequestError("payload must contain userId property");
+    } else if (!unverifiedPagesToAdd.notebookId) {
+        throw new BadRequestError("payload must contain notebookId property");
+    }
+
+    const userId = verifyUUID(unverifiedPagesToAdd.userId);
+    const notebookId = verifyUUID(unverifiedPagesToAdd.notebookId);
+    
+    const pageIds: string[] = [];
+    for (const pageId of unverifiedPagesToAdd.pageIds) {
+        pageIds.push(verifyUUID(pageId));
+    }
+
+    return {
+        userId: userId,
+        notebookId: notebookId,
+        pageIds: pageIds,
+    }
 }
