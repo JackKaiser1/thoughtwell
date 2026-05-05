@@ -3,6 +3,7 @@ import { createPage, getPage, getPages, deletePage, makeChildPage } from "../../
 import { createUser } from "../../db/queries/users.js";
 import { rollbackErrorHandler } from "../../lib/query-helpers.js";
 import { db } from "../../db/index.js";
+import { makePageChildren } from "../../api/add-pages-notebook.js";
 
 describe("createPage", () => {
     it("should create page in db", async () => {
@@ -116,6 +117,39 @@ describe("makeChildPage", () => {
                 const updatedPageRecord = await makeChildPage(tx, pageRecord.id);
 
                 expect(updatedPageRecord.isChild).toEqual(true);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+});
+
+describe("makePageChildren", () => {
+    it("should update isChild to true for 3 pages", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;
+
+                const page = { pageContent: "1st note", userId: userId };
+                const pageRecord = await createPage(tx, page);
+
+                const page2 = { pageContent: "2nd note", userId: userId };
+                const pageRecord2 = await createPage(tx, page2);
+
+                const page3 = { pageContent: "3rd note", userId: userId };
+                const pageRecord3 = await createPage(tx, page3);
+
+                const pageIds = [pageRecord.id, pageRecord2.id, pageRecord3.id];
+
+                const pageRecords = await makePageChildren(tx, pageIds);
+
+                for (let i = 0; i < pageRecords.length; i++) {
+                    expect(pageRecords[i].isChild).toEqual(true);
+                }
 
                 tx.rollback();
             });

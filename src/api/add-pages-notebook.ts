@@ -59,12 +59,13 @@ export async function pageToNotebookQuery(client: dbClient, pagesToAdd: PagesToA
     return pagesToNoteBooksRecords;
 }
 
-export async function makePageChildren(client: dbClient, pageIds: string[]): Promise<void> {
+// Function must be used after UUID verification
+export async function makePageChildren(client: dbClient, pageIds: string[]): Promise<PageRecord[]> {
     const queryPromises: Promise<PageRecord>[] = [];
 
     for (const pageid of pageIds) {
         queryPromises.push(makeChildPage(client, pageid));
     }
 
-    await Promise.all(queryPromises);
+    return await Promise.all(queryPromises);
 }
