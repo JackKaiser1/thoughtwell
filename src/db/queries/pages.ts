@@ -33,3 +33,13 @@ export async function deletePage(client: dbClient, pageId: string) {
             .delete(pages)
             .where(eq(pages.id, pageId));
 }
+
+export async function makeChildPage(client: dbClient, pageId: string) {
+    const [pageRecord] = await client
+                                    .update(pages)
+                                    .set({ isChild: true })
+                                    .where(eq(pages.id, pageId))
+                                    .returning();
+
+    return pageRecord;
+}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createPage, getPage, getPages, deletePage } from "../../db/queries/pages.js";
+import { createPage, getPage, getPages, deletePage, makeChildPage } from "../../db/queries/pages.js";
 import { createUser } from "../../db/queries/users.js";
 import { rollbackErrorHandler } from "../../lib/query-helpers.js";
 import { db } from "../../db/index.js";
@@ -93,6 +93,29 @@ describe("deletePage", () => {
                 const deletedPage = await getPage(tx, pageRecord.id);
 
                 expect(deletedPage).toEqual(undefined);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+});
+
+describe("makeChildPage", () => {
+    it("should update isChild field to true", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;
+
+                const page = { pageContent: "This is a note on a page", userId: userId };
+                const pageRecord = await createPage(tx, page);
+
+                const updatedPageRecord = await makeChildPage(tx, pageRecord.id);
+
+                expect(updatedPageRecord.isChild).toEqual(true);
 
                 tx.rollback();
             });
