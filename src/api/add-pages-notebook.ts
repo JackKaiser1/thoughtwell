@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { BadRequestError } from "./errors.js";
-import { db } from "../db/index.js";
+import { type dbClient, db } from "../db/index.js";
 import { createPagesToNotebooks } from "../db/queries/pages-to-notebooks.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
 import { type PageRecord, type PagesToNotebooksRecord, pages } from "../db/schema.js";
@@ -30,8 +30,8 @@ export async function handlerAddPagesToNotebook(req: Request, res: Response) {
         verifyUUID(pageId);
     }
 
-    const childParentRecords = await pageToNotebookQuery(pagesToAdd);
-    await makePageChildren(pagesToAdd.pageIds);
+    const childParentRecords = await pageToNotebookQuery(db, pagesToAdd);
+    await makePageChildren(db, pagesToAdd.pageIds);
 
     for (const element of childParentRecords) {
         if (!element) {
@@ -42,7 +42,7 @@ export async function handlerAddPagesToNotebook(req: Request, res: Response) {
     res.status(201).json(childParentRecords);
 }
 
-async function pageToNotebookQuery(pagesToAdd: PagesToAdd): Promise<PagesToNotebooksRecord[]> {
+export async function pageToNotebookQuery(client: dbClient, pagesToAdd: PagesToAdd): Promise<PagesToNotebooksRecord[]> {
     const queryPromises: Promise<PagesToNotebooksRecord>[] = [];
 
     for (const pageId of pagesToAdd.pageIds) {
@@ -52,18 +52,18 @@ async function pageToNotebookQuery(pagesToAdd: PagesToAdd): Promise<PagesToNoteb
             parentNotebookId: pagesToAdd.notebookId,
             childPageId: pageId,
         }
-        queryPromises.push(createPagesToNotebooks(db, childParentQuery));
+        queryPromises.push(createPagesToNotebooks(client, childParentQuery));
     }
 
     const pagesToNoteBooksRecords = await Promise.all(queryPromises);
     return pagesToNoteBooksRecords;
 }
 
-async function makePageChildren(pageIds: string[]): Promise<void> {
+export async function makePageChildren(client: dbClient, pageIds: string[]): Promise<void> {
     const queryPromises: Promise<PageRecord>[] = [];
 
     for (const pageid of pageIds) {
-        queryPromises.push(makeChildPage(db, pageid));
+        queryPromises.push(makeChildPage(client, pageid));
     }
 
     await Promise.all(queryPromises);
