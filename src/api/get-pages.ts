@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getPages, getPage } from "../db/queries/pages.js";
+import { getPages, getPage, getLoosePages } from "../db/queries/pages.js";
 import { BadRequestError, NotFoundError } from "./errors.js";
 import { db } from "../db/index.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
@@ -18,6 +18,12 @@ export async function handlerGetPages(req: Request, res: Response) {
     if (!pageRecords.length) {
         throw new NotFoundError("failed to fetch pages");
     }
+
+    console.log("---");
+    for (const page of pageRecords) {
+        console.log(page.pageContent);
+    }
+    console.log("---");
 
     res.status(200).json(pageRecords);
 }
@@ -38,4 +44,23 @@ export async function handlerGetPage(req: Request, res: Response) {
     }
 
     res.status(200).json(pageRecord);
+}
+
+export async function handlerGetLoosePages(req: Request, res: Response) {
+    const unverifiedUserId = req.query.userId;
+    const userId = verifyUUID(unverifiedUserId);
+
+    const loosePageRecords = await getLoosePages(db, userId);
+    if (loosePageRecords.length < 1) {
+        throw new NotFoundError("No loose pages found for user");
+    }
+
+    console.log("---");
+    for (const page of loosePageRecords) {
+        console.log(page.pageContent);
+    }
+    console.log("---");
+
+
+    res.status(200).json(loosePageRecords);
 }
