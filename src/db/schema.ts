@@ -37,7 +37,19 @@ export const pagesToNotebooks = pgTable("pages_to_notebooks", {
     (t) => [uniqueIndex("page_of_notebook").on(t.childPageId, t.parentNotebookId)]
 );
 
+export const notebooksToNotebooks = pgTable("notebooks_to_notebooks", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+    childNotebookId: uuid("child_notebook_id").notNull().references(() => notebooks.id, { onDelete: "cascade" }),
+    parentNotebookId: uuid("parent_notebook_id").notNull().references(() => notebooks.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" })
+}, 
+    (t) => [uniqueIndex("notebooks_of_notebooks").on(t.childNotebookId, t.parentNotebookId)]
+);
+
 export type UserRecord = typeof users.$inferInsert;
 export type PageRecord = typeof pages.$inferInsert;
 export type NotebookRecord = typeof notebooks.$inferInsert;
 export type PagesToNotebooksRecord = typeof pagesToNotebooks.$inferInsert;
+export type NotebooksToNotebooksRecord = typeof notebooksToNotebooks.$inferInsert;
