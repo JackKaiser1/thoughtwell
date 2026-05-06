@@ -43,6 +43,13 @@
       "when": 1777911070598,
       "tag": "0005_happy_titania",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1778079999416,
+      "tag": "0006_wild_wolf_cub",
+      "breakpoints": true
     }
   ]
 }
