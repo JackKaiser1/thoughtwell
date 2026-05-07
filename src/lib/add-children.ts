@@ -43,6 +43,9 @@ export async function addChildrenToNotebook(client: dbClient,
                                             makeChildrenQueryFunc: makeChildQueryFunc) {
                                                 
     const childrenToAdd = verifyChildrenToAdd(payload);
+    // Add function to check current child parent relationship
+    // Delete if child belongs to parent already
+    // Do nothing if it does not
     const childParentRecords = await addChildrenQuery(client, childrenToAdd, addChildrenQueryFunc);
     await makeChildren(client, childrenToAdd.childIds, makeChildrenQueryFunc);
 
