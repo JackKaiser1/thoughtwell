@@ -7,27 +7,33 @@ import { type PagesToNotebooksRecord,
 import { type dbClient, db } from "../db/index.js";
 import { NotebooksToNotebooksQuery } from "../db/queries/notebooks-to-notebooks.js";
 import { PagesToNotebooksQuery } from "../db/queries/pages-to-notebooks.js";
+import { createNotebooksToNotebooks } from "../db/queries/notebooks-to-notebooks.js";
+import { createPagesToNotebooks } from "../db/queries/pages-to-notebooks.js";
+import { makeChildPage } from "../db/queries/pages.js";
+import { makeChildNotebook } from "../db/queries/notebooks.js";
 
-type ChildrenToAdd = {
+export type ChildrenToAdd = {
     typeOfChild: "pages" | "notebooks",
     childIds: string[];
     notebookId: string;
     userId: string;
 }
 
-type AddChildrenOmit = Omit<PagesToNotebooksQuery, "childPageId">;
 
-type AddChildrenData = {
-    // [key: string]: string | undefined;
-    userId: string,
-    parentNotebookId: string;
-    childPageId?: string;
-    childNotebookId?: string;
-}
+type AddChildrenQueryFunc = typeof createPagesToNotebooks | typeof createNotebooksToNotebooks;
 
-type AddChildrenQueryFunc = (client: dbClient, queryData: AddChildrenData) => Promise<PagesToNotebooksRecord | NotebooksToNotebooksRecord>;
+type makeChildQueryFunc = typeof makeChildPage | typeof makeChildNotebook;
 
-type makeChildQueryFunc = (client: dbClient, childId: string) => Promise<PageRecord | NotebookRecord>;
+
+export async function addChildrenToNotebook(client: dbClient, 
+                               payload: unknown,
+                               addChildrenQueryFunc: typeof createPagesToNotebooks,
+                               makeChildrenQueryFunc: typeof makeChildPage): Promise<PagesToNotebooksRecord[]>;
+
+export async function addChildrenToNotebook(client: dbClient, 
+                               payload: unknown,
+                               addChildrenQueryFunc: typeof createNotebooksToNotebooks,
+                               makeChildrenQueryFunc: typeof makeChildNotebook): Promise<NotebooksToNotebooksRecord[]>;
 
 
 
@@ -37,9 +43,10 @@ export async function addChildrenToNotebook(client: dbClient,
                                             makeChildrenQueryFunc: makeChildQueryFunc) {
                                                 
     const childrenToAdd = verifyChildrenToAdd(payload);
-    const childParentRecords = addChildrenQuery(client, childrenToAdd, addChildrenQueryFunc);
+    const childParentRecords = await addChildrenQuery(client, childrenToAdd, addChildrenQueryFunc);
     await makeChildren(client, childrenToAdd.childIds, makeChildrenQueryFunc);
-    return childParentRecords;
+
+    return childParentRecords
 }
 
 
@@ -89,26 +96,34 @@ export function isChildrenToAdd(obj: unknown): obj is ChildrenToAdd {
 
 
 
-export async function addChildrenQuery(client: dbClient, childrenToAdd: ChildrenToAdd, queryFunc: AddChildrenQueryFunc) {
+export async function addChildrenQuery(client: dbClient, childrenToAdd: ChildrenToAdd, queryFunc: any) {
     const queryPromises: Promise<PagesToNotebooksRecord | NotebooksToNotebooksRecord>[] = [];
 
     for (const id of childrenToAdd.childIds) {
+        let childParentQuery: PagesToNotebooksQuery | NotebooksToNotebooksQuery;
 
-        const childParentQuery: AddChildrenData = {
-            userId: childrenToAdd.userId,
-            parentNotebookId: childrenToAdd.notebookId,
+        if (childrenToAdd.typeOfChild === "pages") {
+            childParentQuery = {
+                    userId: childrenToAdd.userId,
+                    parentNotebookId: childrenToAdd.notebookId,
+                    childPageId: id,
+            }
+        } else if (childrenToAdd.typeOfChild === "notebooks") {
+            childParentQuery = {
+                    userId: childrenToAdd.userId,
+                    parentNotebookId: childrenToAdd.notebookId,
+                    childNotebookId: id,
+            }
+        } else {
+            throw new BadRequestError("Payload invalid");
         }
 
-        switch (childrenToAdd.typeOfChild) {
-            case "pages":
-                childParentQuery.childPageId = id;
-                break;
-            case "notebooks":
-                childParentQuery.childNotebookId = id;
-                break;
+        if ("childPageId" in childParentQuery) {
+            queryPromises.push(queryFunc(client, childParentQuery));
+        } else if ("childNotebookId" in childParentQuery) {
+            queryPromises.push(queryFunc(client, childParentQuery));
         }
 
-        queryPromises.push(queryFunc(client, childParentQuery));
     }
 
     const childParentRecords = await Promise.all(queryPromises);
