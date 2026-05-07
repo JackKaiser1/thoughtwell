@@ -37,3 +37,12 @@ export async function deleteNotebooks(client: dbClient, userId: string) {
             .delete(notebooks)
             .where(eq(notebooks.userId, userId));
 }
+
+export async function makeChildNotebook(client: dbClient, notebookId: string) {
+    const [notebookRecord] = await client 
+                                        .update(notebooks)
+                                        .set({ isChild: true })
+                                        .where(eq(notebooks.id, notebookId))
+                                        .returning();
+    return notebookRecord;
+}
