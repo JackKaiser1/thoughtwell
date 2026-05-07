@@ -2,8 +2,9 @@ import { dbClient } from "../index.js";
 import { eq } from "drizzle-orm";
 import { type PagesToNotebooksRecord, pagesToNotebooks } from "../schema.js";
 
+export type PagesToNotebooksQuery = Omit<PagesToNotebooksRecord, "id" | "createdAt" | "updatedAt">;
 
-export async function createPagesToNotebooks(client: dbClient, pagesToNotebooksQuery: PagesToNotebooksRecord) {
+export async function createPagesToNotebooks(client: dbClient, pagesToNotebooksQuery: PagesToNotebooksQuery) {
     const [pagesToNoteBooksRecord] = await client
                                                 .insert(pagesToNotebooks)
                                                 .values(pagesToNotebooksQuery)

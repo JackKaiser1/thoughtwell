@@ -13,6 +13,8 @@ import { handlerCreateNotebook } from "./api/create-notebook.js";
 import { handlerGetNotebooks } from "./api/get-notebooks.js";
 import { handlerAddPagesToNotebook } from "./api/add-pages-notebook.js";
 import { handlerGetPagesOfNotebook } from "./api/get-pages-from-notebook.js";
+import { handlerAddNotebooksToNotebook } from "./api/add-notebooks-notebooks.js";
+import { handlerGetChildren } from "./api/get-notebooks-from-notebook.js";
 
 export const app = express();
 const PORT = 8080;
@@ -90,6 +92,13 @@ app.get("/api/notebooks/:notebookId/pages", async (req, res, next) => {
     Promise.resolve(await handlerGetPagesOfNotebook(req, res)).catch(next);
 });
 
+app.post("/api/notebooks/addNotebooks", async (req, res, next) => {
+    Promise.resolve(await handlerAddNotebooksToNotebook(req, res)).catch(next);
+});
+
+app.get("/api/notebooks/:notebookId/children", async (req, res, next) => {
+    Promise.resolve(await handlerGetChildren(req, res)).catch(next);
+});
 
 
 

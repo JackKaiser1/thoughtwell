@@ -5,6 +5,7 @@ import { createPagesToNotebooks } from "../db/queries/pages-to-notebooks.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
 import { type PageRecord, type PagesToNotebooksRecord, pages } from "../db/schema.js";
 import { makeChildPage } from "../db/queries/pages.js";
+import { addChildrenToNotebook } from "../lib/add-children.js";
 
 export type PagesToAdd = {
     pageIds: string[];
@@ -13,11 +14,13 @@ export type PagesToAdd = {
 }
 
 export async function handlerAddPagesToNotebook(req: Request, res: Response) {
-    const unverifiedPagesToAdd: PagesToAdd = req.body;
-    const pagesToAdd = verifyPagesToAdd(unverifiedPagesToAdd);
+    // const unverifiedPagesToAdd: PagesToAdd = req.body;
+    // const pagesToAdd = verifyPagesToAdd(unverifiedPagesToAdd);
 
-    const childParentRecords = await pageToNotebookQuery(db, pagesToAdd);
-    await makePageChildren(db, pagesToAdd.pageIds);
+    // const childParentRecords = await pageToNotebookQuery(db, pagesToAdd);
+    // await makePageChildren(db, pagesToAdd.pageIds);
+
+    const childParentRecords = await addChildrenToNotebook(db, req.body, createPagesToNotebooks, makeChildPage);
 
     for (const element of childParentRecords) {
         if (!element) {
@@ -27,6 +30,14 @@ export async function handlerAddPagesToNotebook(req: Request, res: Response) {
 
     res.status(201).json(childParentRecords);
 }
+
+
+
+
+
+
+
+
 
 
 // Function must be used after UUID verification

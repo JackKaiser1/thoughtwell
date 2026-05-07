@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { rollbackErrorHandler } from "../../lib/query-helpers.js";
 import { db } from "../../db/index.js";
-import { createNotebook, getNotebook, getNotebooks, deleteNotebook, deleteNotebooks } from "../../db/queries/notebooks.js";
+import { createNotebook, getNotebook, getNotebooks, deleteNotebook, deleteNotebooks, makeChildNotebook } from "../../db/queries/notebooks.js";
 import { createUser } from "../../db/queries/users.js";
 import { NotebookRecord } from "../../db/schema.js";
 
@@ -131,3 +131,26 @@ describe("deleteNotebook / deleteNotebooks", () => {
     });
 });
 
+describe("makeChildNotebook", () => {
+    it("should update the isChild property of a notebook", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;   
+                
+                const notebook: NotebookRecord = { notebookName: "First Notebook", userId: userId };
+                const notebookRecord = await createNotebook(tx, notebook);
+
+                const updatedNotebookRecord = await makeChildNotebook(tx, notebookRecord.id);
+
+                expect(notebookRecord.isChild).toEqual(false);
+                expect(updatedNotebookRecord.isChild).toEqual(true);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+});
