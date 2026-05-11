@@ -5,8 +5,8 @@ import { type NotebooksToNotebooksQuery, createNotebooksToNotebooks, getChildren
 import { createUser } from "../../db/queries/users.js";
 import { createNotebook } from "../../db/queries/notebooks.js";
 import { createPage } from "../../db/queries/pages.js";
-import { PagesToAdd } from "../../api/add-pages-notebook.js";
-import { pageToNotebookQuery } from "../../api/add-pages-notebook.js";
+import { type ChildrenToAdd, addChildrenQuery } from "../../lib/add-children.js";
+import { createPagesToNotebooks } from "../../db/queries/pages-to-notebooks.js";
 
 describe("createNotebooksToNotebooks", () => {
     it("should create notebooksToNotebooks record in db", async () => {
@@ -66,13 +66,14 @@ describe("getChildren", () => {
                 const page3 = { pageContent: "3rd note", userId: userId };
                 const pageRecord3 = await createPage(tx, page3);
 
-                const pagesToAdd: PagesToAdd = {
+                const pagesToAdd: ChildrenToAdd = {
+                    typeOfChild: "pages",
                     userId: userId,
                     notebookId: parentNotebookId,
-                    pageIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
+                    childIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
                 }
                 
-                await pageToNotebookQuery(tx, pagesToAdd);
+                await addChildrenQuery(tx, pagesToAdd, createPagesToNotebooks);
 
 
                 const childNotebook = { notebookName: "Inner Notebook", userId: userId };

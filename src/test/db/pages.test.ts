@@ -3,7 +3,8 @@ import { createPage, getPage, getPages, deletePage, makeChildPage, getLoosePages
 import { createUser } from "../../db/queries/users.js";
 import { rollbackErrorHandler } from "../../lib/query-helpers.js";
 import { db } from "../../db/index.js";
-import { makePageChildren } from "../../api/add-pages-notebook.js";
+import { makeChildren } from "../../lib/add-children.js";
+import { PageRecord } from "../../db/schema.js";
 
 describe("createPage", () => {
     it("should create page in db", async () => {
@@ -145,7 +146,7 @@ describe("makePageChildren", () => {
 
                 const pageIds = [pageRecord.id, pageRecord2.id, pageRecord3.id];
 
-                const pageRecords = await makePageChildren(tx, pageIds);
+                const pageRecords = await makeChildren(tx, pageIds, makeChildPage) as PageRecord[];
 
                 for (let i = 0; i < pageRecords.length; i++) {
                     expect(pageRecords[i].isChild).toEqual(true);
@@ -176,7 +177,7 @@ describe("getLoosePages", () => {
                 const page3 = { pageContent: "3rd note", userId: userId };
                 const pageRecord3 = await createPage(tx, page3);
 
-                await makePageChildren(tx, [pageRecord3.id]);
+                await makeChildren(tx, [pageRecord3.id], makeChildPage);
 
                 const loosePages = await getLoosePages(tx, userId);
                 const allPages = await getPages(tx, userId);

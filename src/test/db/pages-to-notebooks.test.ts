@@ -3,10 +3,11 @@ import { rollbackErrorHandler } from "../../lib/query-helpers.js";
 import { db } from "../../db/index.js";
 import { createPagesToNotebooks, getPageChildren } from "../../db/queries/pages-to-notebooks.js";
 import { createUser } from "../../db/queries/users.js";
-import { createPage } from "../../db/queries/pages.js";
+import { createPage, makeChildPage } from "../../db/queries/pages.js";
 import { createNotebook } from "../../db/queries/notebooks.js";
 import { notebooks, PagesToNotebooksRecord } from "../../db/schema.js";
-import { type PagesToAdd, pageToNotebookQuery } from "../../api/add-pages-notebook.js"
+import { type ChildrenToAdd, addChildrenToNotebook } from "../../lib/add-children.js";
+
 
 describe("createPagesToNotebooks", () => {
     it("should create pagesToNoteBooks record in db", async () => {
@@ -113,15 +114,16 @@ describe("pageToNotebookQuery", () => {
                 const notebookRecord = await createNotebook(tx, notebook);
                 const notebookId = notebookRecord.id;
 
-                const pagesToAdd: PagesToAdd = {
+                const pagesToAdd: ChildrenToAdd = {
+                    typeOfChild: "pages",
                     userId: userId,
                     notebookId: notebookId,
-                    pageIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
+                    childIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
                 }
 
-                const childParentRecords = await pageToNotebookQuery(tx, pagesToAdd);
+                const childParentRecords = await addChildrenToNotebook(tx, pagesToAdd, createPagesToNotebooks, makeChildPage);
                 
-                expect(childParentRecords.length).toEqual(pagesToAdd.pageIds.length);
+                expect(childParentRecords.length).toEqual(pagesToAdd.childIds.length);
                 expect(childParentRecords[0].childPageId).toEqual(pageRecord.id);
                 expect(childParentRecords[1].childPageId).toEqual(pageRecord2.id);
                 expect(childParentRecords[2].childPageId).toEqual(pageRecord3.id);
