@@ -1,9 +1,14 @@
 import { dbClient } from "../index.js";
 import { eq } from "drizzle-orm";
-import { type NotebooksToNotebooksRecord, notebooksToNotebooks, pages, pagesToNotebooks } from "../schema.js";
+import { type NotebooksToNotebooksRecord, PagesToNotebooksRecord, notebooksToNotebooks, pages, pagesToNotebooks } from "../schema.js";
 import { exceptAll, unionAll } from 'drizzle-orm/pg-core'
 
 export type NotebooksToNotebooksQuery = Omit<NotebooksToNotebooksRecord, "id" | "createdAt" | "updatedAt">;
+
+export type TopLevelChildren = {
+    pageChildren: PagesToNotebooksRecord[],
+    notebookChildren: NotebooksToNotebooksRecord[],
+}
 
 export async function createNotebooksToNotebooks(client: dbClient, queryData: NotebooksToNotebooksQuery) {
     const [notebooksToNotebooksRecord] = await client 
@@ -14,7 +19,7 @@ export async function createNotebooksToNotebooks(client: dbClient, queryData: No
     return notebooksToNotebooksRecord;
 }
 
-export async function getChildren(client: dbClient, notebookId: string) {
+export async function getChildren(client: dbClient, notebookId: string): Promise<TopLevelChildren> {
     const childNotebookRecords = await client 
                                             .select()
                                             .from(pagesToNotebooks)
