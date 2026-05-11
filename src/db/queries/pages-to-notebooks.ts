@@ -21,3 +21,10 @@ export async function getPageChildren(client: dbClient, notebookId: string) {
     return PagesToNotebooksRecord;
 }
 
+export async function deletePagesToNotebooks(client: dbClient, pageId: string) {
+    await client 
+                .delete(pagesToNotebooks)
+                .where(eq(pagesToNotebooks.childPageId, pageId));
+}
+
+
