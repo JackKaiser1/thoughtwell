@@ -44,6 +44,15 @@ export async function makeChildPage(client: dbClient, pageId: string) {
     return pageRecord;
 }
 
+export async function removeAsChildPage(client: dbClient, pageId: string) {
+    const [pageRecord] = await client 
+                                    .update(pages)
+                                    .set({ isChild: false })
+                                    .where(eq(pages.id, pageId))
+                                    .returning();
+    return pageRecord;
+}
+
 export async function getLoosePages(client: dbClient, userId: string) {
     const pageRecords = await client
                                     .select()

@@ -46,3 +46,12 @@ export async function makeChildNotebook(client: dbClient, notebookId: string) {
                                         .returning();
     return notebookRecord;
 }
+
+export async function removeAsChildNotebook(client: dbClient, notebookId: string) {
+    const [notebookRecord] = await client 
+                                        .update(notebooks)
+                                        .set({ isChild: false })
+                                        .where(eq(notebooks.id, notebookId))
+                                        .returning();
+    return notebookRecord;
+}
