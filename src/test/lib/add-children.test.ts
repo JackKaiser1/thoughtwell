@@ -5,7 +5,8 @@ import { type ChildrenToAdd,
         addChildrenQuery,
         isPagesToNotebooksRecord, 
         isNotebooksToNotebooksRecord,
-        makeChildren} from "../../lib/add-children.js";
+        makeChildren,
+        removePriorRelationships} from "../../lib/add-children.js";
 import { describe, it, expect } from "vitest";
 import { rollbackErrorHandler } from "../../lib/query-helpers.js";
 import { db } from "../../db/index.js";
@@ -15,7 +16,7 @@ import { createNotebook } from "../../db/queries/notebooks.js";
 import { createPagesToNotebooks, getPageChildren, PagesToNotebooksQuery, deletePagesToNotebooks } from "../../db/queries/pages-to-notebooks.js";
 import { makeChildPage } from "../../db/queries/pages.js";
 import { NotebooksToNotebooksRecord, PagesToNotebooksRecord, PageRecord, NotebookRecord } from "../../db/schema.js";
-import { createNotebooksToNotebooks, NotebooksToNotebooksQuery, deleteNotebooksToNotebooks } from "../../db/queries/notebooks-to-notebooks.js";
+import { createNotebooksToNotebooks, NotebooksToNotebooksQuery, deleteNotebooksToNotebooks, getChildren } from "../../db/queries/notebooks-to-notebooks.js";
 import { makeChildNotebook } from "../../db/queries/notebooks.js";
 import { BadRequestError } from "../../api/errors.js";
 
@@ -631,6 +632,88 @@ describe("makeChildren", () => {
                 for (const notebookRecord of updatedNotebookRecords) {
                     expect(notebookRecord.isChild).toEqual(true);
                 }
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+});
+
+describe("removePriorRelationships", () => {
+    it("should remove pages from notebook", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;
+
+                const page = { pageContent: "1st note", userId: userId };
+                const pageRecord = await createPage(tx, page);
+
+                const page2 = { pageContent: "2nd note", userId: userId };
+                const pageRecord2 = await createPage(tx, page2);
+
+                const page3 = { pageContent: "3rd note", userId: userId };
+                const pageRecord3 = await createPage(tx, page3);
+
+                const notebook = { notebookName: "New Notebook", userId: userId };
+                const notebookRecord = await createNotebook(tx, notebook);
+                const notebookId = notebookRecord.id;
+
+                const childrenToAdd: ChildrenToAdd = {
+                    typeOfChild: "pages",
+                    userId: userId,
+                    notebookId: notebookId,
+                    childIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
+                };
+
+                await addChildrenToNotebook(tx, childrenToAdd, deletePagesToNotebooks, createPagesToNotebooks, makeChildPage);
+
+                await removePriorRelationships(tx, deletePagesToNotebooks, childrenToAdd);
+
+                const childParentRecords = await getPageChildren(tx, notebookId);
+
+                expect(childParentRecords.length).toEqual(0);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+
+    it("should remove notebook from notebook", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;
+
+                const childNotebook = { notebookName: "New Notebook", userId: userId };
+                const childNotebookRecord = await createNotebook(tx, childNotebook);
+                const childNotebookId = childNotebookRecord.id;
+
+                const parentNotebook = { notebookName: "Parent Notebook", userId: userId };
+                const parentNotebookRecord = await createNotebook(tx, parentNotebook);
+                const parentNotebookId = parentNotebookRecord.id;
+
+                const childrenToAdd: ChildrenToAdd = {
+                    typeOfChild: "notebooks",
+                    userId: userId,
+                    notebookId: parentNotebookId,
+                    childIds: [childNotebookId],
+                };
+
+                await addChildrenToNotebook(tx, childrenToAdd, deleteNotebooksToNotebooks, createNotebooksToNotebooks, makeChildNotebook);
+
+                await removePriorRelationships(tx, deleteNotebooksToNotebooks, childrenToAdd);
+
+                const children = await getChildren(tx, parentNotebookId);
+                const notebookChildren = children.notebookChildren;
+
+                expect(notebookChildren.length).toEqual(0);
 
                 tx.rollback();
             });
