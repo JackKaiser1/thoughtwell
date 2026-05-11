@@ -29,3 +29,9 @@ export async function getChildren(client: dbClient, notebookId: string) {
         notebookChildren: notebookNotebooksRecords,
     };
 }
+
+export async function deleteNotebooksToNotebooks(client: dbClient, childNotebookId: string) {
+    await client 
+                .delete(notebooksToNotebooks)
+                .where(eq(notebooksToNotebooks.childNotebookId, childNotebookId));
+}
