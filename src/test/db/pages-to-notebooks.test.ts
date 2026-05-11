@@ -9,6 +9,7 @@ import { notebooks, PagesToNotebooksRecord } from "../../db/schema.js";
 import { type ChildrenToAdd, addChildrenToNotebook } from "../../lib/add-children.js";
 
 
+
 describe("createPagesToNotebooks", () => {
     it("should create pagesToNoteBooks record in db", async () => {
         try {
@@ -121,7 +122,7 @@ describe("pageToNotebookQuery", () => {
                     childIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
                 }
 
-                const childParentRecords = await addChildrenToNotebook(tx, pagesToAdd, createPagesToNotebooks, makeChildPage);
+                const childParentRecords = await addChildrenToNotebook(tx, pagesToAdd, deletePagesToNotebooks, createPagesToNotebooks, makeChildPage);
                 
                 expect(childParentRecords.length).toEqual(pagesToAdd.childIds.length);
                 expect(childParentRecords[0].childPageId).toEqual(pageRecord.id);
@@ -164,7 +165,7 @@ describe("deletePagesToNotebooks", () => {
                     childIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
                 }
 
-                const childParentRecords = await addChildrenToNotebook(tx, pagesToAdd, createPagesToNotebooks, makeChildPage);
+                const childParentRecords = await addChildrenToNotebook(tx, pagesToAdd, deletePagesToNotebooks, createPagesToNotebooks, makeChildPage);
 
                 await deletePagesToNotebooks(tx, pageRecord3.id);
 

@@ -12,10 +12,10 @@ import { db } from "../../db/index.js";
 import { createUser } from "../../db/queries/users.js";
 import { createPage } from "../../db/queries/pages.js";
 import { createNotebook } from "../../db/queries/notebooks.js";
-import { createPagesToNotebooks, getPageChildren, PagesToNotebooksQuery } from "../../db/queries/pages-to-notebooks.js";
+import { createPagesToNotebooks, getPageChildren, PagesToNotebooksQuery, deletePagesToNotebooks } from "../../db/queries/pages-to-notebooks.js";
 import { makeChildPage } from "../../db/queries/pages.js";
 import { NotebooksToNotebooksRecord, PagesToNotebooksRecord, PageRecord, NotebookRecord } from "../../db/schema.js";
-import { createNotebooksToNotebooks, NotebooksToNotebooksQuery } from "../../db/queries/notebooks-to-notebooks.js";
+import { createNotebooksToNotebooks, NotebooksToNotebooksQuery, deleteNotebooksToNotebooks } from "../../db/queries/notebooks-to-notebooks.js";
 import { makeChildNotebook } from "../../db/queries/notebooks.js";
 import { BadRequestError } from "../../api/errors.js";
 
@@ -47,7 +47,7 @@ describe("addChildrenToNotebook", () => {
                     childIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
                 };
 
-                const childParentRecords = await addChildrenToNotebook(tx, childrenToAdd, createPagesToNotebooks, makeChildPage);
+                const childParentRecords = await addChildrenToNotebook(tx, childrenToAdd, deletePagesToNotebooks, createPagesToNotebooks, makeChildPage);
 
                 for (const record of childParentRecords) {
                     expect(record.userId).toEqual(userRecord.id);
@@ -92,7 +92,7 @@ describe("addChildrenToNotebook", () => {
                     childIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
                 };
 
-                await addChildrenToNotebook(tx, childrenToAdd1, createPagesToNotebooks, makeChildPage);
+                await addChildrenToNotebook(tx, childrenToAdd1, deleteNotebooksToNotebooks, createPagesToNotebooks, makeChildPage);
 
                 const parentNotebook = { notebookName: "Parent Notebook", userId: userId };
                 const parentNotebookRecord = await createNotebook(tx, parentNotebook);
@@ -105,7 +105,7 @@ describe("addChildrenToNotebook", () => {
                     childIds: [childNotebookId],
                 };
                 
-                const childParentRecords = await addChildrenToNotebook(tx, childrenToAdd2, createNotebooksToNotebooks, makeChildNotebook);
+                const childParentRecords = await addChildrenToNotebook(tx, childrenToAdd2, deleteNotebooksToNotebooks, createNotebooksToNotebooks, makeChildNotebook);
                 
                 expect(childParentRecords[0].userId).toEqual(userRecord.id);
                 expect(childParentRecords[0].parentNotebookId).toEqual(parentNotebookRecord.id);

@@ -7,8 +7,8 @@ import { type PagesToNotebooksRecord,
 import { type dbClient, db } from "../db/index.js";
 import { NotebooksToNotebooksQuery } from "../db/queries/notebooks-to-notebooks.js";
 import { PagesToNotebooksQuery } from "../db/queries/pages-to-notebooks.js";
-import { createNotebooksToNotebooks } from "../db/queries/notebooks-to-notebooks.js";
-import { createPagesToNotebooks } from "../db/queries/pages-to-notebooks.js";
+import { createNotebooksToNotebooks, deleteNotebooksToNotebooks} from "../db/queries/notebooks-to-notebooks.js";
+import { createPagesToNotebooks, deletePagesToNotebooks } from "../db/queries/pages-to-notebooks.js";
 import { makeChildPage } from "../db/queries/pages.js";
 import { makeChildNotebook } from "../db/queries/notebooks.js";
 
@@ -24,14 +24,18 @@ type AddChildrenQueryFunc = typeof createPagesToNotebooks | typeof createNoteboo
 
 type makeChildQueryFunc = typeof makeChildPage | typeof makeChildNotebook;
 
+type DeleteQuery = typeof deletePagesToNotebooks | typeof deleteNotebooksToNotebooks;
+
 
 export async function addChildrenToNotebook(client: dbClient, 
                                payload: unknown,
+                               deleteQueryFunc: DeleteQuery,
                                addChildrenQueryFunc: typeof createPagesToNotebooks,
                                makeChildrenQueryFunc: typeof makeChildPage): Promise<PagesToNotebooksRecord[]>;
 
 export async function addChildrenToNotebook(client: dbClient, 
                                payload: unknown,
+                               deleteQueryFunc: DeleteQuery,
                                addChildrenQueryFunc: typeof createNotebooksToNotebooks,
                                makeChildrenQueryFunc: typeof makeChildNotebook): Promise<NotebooksToNotebooksRecord[]>;
 
@@ -39,13 +43,12 @@ export async function addChildrenToNotebook(client: dbClient,
 
 export async function addChildrenToNotebook(client: dbClient, 
                                             payload: unknown, 
+                                            deleteQueryFunc: DeleteQuery,
                                             addChildrenQueryFunc: AddChildrenQueryFunc,
                                             makeChildrenQueryFunc: makeChildQueryFunc) {
                                                 
     const childrenToAdd = verifyChildrenToAdd(payload);
-    // Add function to check current child parent relationship
-    // Delete if child belongs to parent already
-    // Do nothing if it does not
+    await removePriorRelationships(client, deleteQueryFunc, childrenToAdd);
     const childParentRecords = await addChildrenQuery(client, childrenToAdd, addChildrenQueryFunc);
     await makeChildren(client, childrenToAdd.childIds, makeChildrenQueryFunc);
 
@@ -97,6 +100,17 @@ export function isChildrenToAdd(obj: unknown): obj is ChildrenToAdd {
     return true;
 }
 
+
+export async function removePriorRelationships(client: dbClient, deleteQuery: DeleteQuery, childrenToAdd: ChildrenToAdd) {
+    const queryPromises: Promise<void>[] = [];
+
+    for (const id of childrenToAdd.childIds) {
+
+        queryPromises.push(deleteQuery(client, id));
+    }
+
+    Promise.all(queryPromises);
+}
 
 
 export async function addChildrenQuery(client: dbClient, childrenToAdd: ChildrenToAdd, queryFunc: any) {
