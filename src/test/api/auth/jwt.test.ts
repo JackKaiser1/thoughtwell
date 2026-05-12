@@ -1,5 +1,5 @@
 import { expect, describe, it, vi } from "vitest";
-import { createJWT, verifyJWT } from "../../../api/auth/jwt.ts";
+import { createJWT, verifyJWT, getBearerToken } from "../../../api/auth/jwt.ts";
 import { BadRequestError } from "../../../api/errors.ts";
 
 describe("createJWT / verifyJWT", () => {
@@ -22,3 +22,16 @@ describe("createJWT / verifyJWT", () => {
     });
 });
 
+describe("getBearerToken", () => {
+    it("should strip the string and return the token", () => {
+        const bearerToken = "Bearer thisisajwt";
+        const token = getBearerToken(bearerToken);
+        expect(token).toEqual("thisisajwt");
+    });
+
+    it("should strip the string and return the token and remove whitespace", () => {
+        const bearerToken = "Bearer         thisisajwt      ";
+        const token = getBearerToken(bearerToken);
+        expect(token).toEqual("thisisajwt");
+    });
+});

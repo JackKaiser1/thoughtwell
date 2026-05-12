@@ -38,3 +38,7 @@ export function verifyJWT(token: string, secret: string): string {
         }
     }
 }
+
+export function getBearerToken(bearerTokenString: string) {
+    return bearerTokenString.replace("Bearer", "").trim();
+}
