@@ -1,5 +1,5 @@
 import { dbClient } from "../index.js";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { type NotebookRecord, notebooks, users } from "../schema.js";
 
 export async function createNotebook(client: dbClient, notebook: NotebookRecord) {
@@ -54,4 +54,17 @@ export async function removeAsChildNotebook(client: dbClient, notebookId: string
                                         .where(eq(notebooks.id, notebookId))
                                         .returning();
     return notebookRecord;
+}
+
+export async function getTopLevelNotebooks(client: dbClient, userId: string) {
+    const notebooksRecords = await client 
+                                        .select()
+                                        .from(notebooks)
+                                        .where(
+                                            and(
+                                                eq(notebooks.userId, userId),
+                                                eq(notebooks.isChild, false),
+                                            )
+                                        );
+    return notebooksRecords;
 }

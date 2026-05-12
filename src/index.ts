@@ -10,7 +10,7 @@ import { handlerCreatePage } from "./api/create-page.js";
 import { handlerGetPage, handlerGetPages, handlerGetLoosePages } from "./api/get-pages.js";
 import { handlerDeletePage } from "./api/delete-page.js";
 import { handlerCreateNotebook } from "./api/create-notebook.js";
-import { handlerGetNotebooks } from "./api/get-notebooks.js";
+import { handlerGetNotebooks, handlerGetTopLevelNotebooks } from "./api/get-notebooks.js";
 import { handlerAddPagesToNotebook } from "./api/add-pages-notebook.js";
 import { handlerGetPagesOfNotebook } from "./api/get-pages-from-notebook.js";
 import { handlerAddNotebooksToNotebook } from "./api/add-notebooks-notebooks.js";
@@ -81,6 +81,10 @@ app.post("/api/notebooks", async (req, res, next) => {
 });
 
 app.get("/api/notebooks", async (req, res, next) => {
+    Promise.resolve(await handlerGetTopLevelNotebooks(req, res)).catch(next);
+});
+
+app.get("/api/notebooks/all", async (req, res, next) => {
     Promise.resolve(await handlerGetNotebooks(req, res)).catch(next);
 });
 

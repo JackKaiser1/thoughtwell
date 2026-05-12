@@ -50,6 +50,13 @@
       "when": 1778079999416,
       "tag": "0006_wild_wolf_cub",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1778608506542,
+      "tag": "0007_fast_slapstick",
+      "breakpoints": true
     }
   ]
 }
