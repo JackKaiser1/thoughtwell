@@ -48,8 +48,18 @@ export const notebooksToNotebooks = pgTable("notebooks_to_notebooks", {
     (t) => [uniqueIndex("notebooks_of_notebooks").on(t.childNotebookId, t.parentNotebookId)]
 );
 
+export const refreshTokens = pgTable("refresh_tokens", {
+    token: varchar("token").primaryKey().notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    expiresAt: timestamp("expires_at").notNull(),
+    revokedAt: timestamp("revoked_At"),
+});
+
 export type UserRecord = typeof users.$inferInsert;
 export type PageRecord = typeof pages.$inferInsert;
 export type NotebookRecord = typeof notebooks.$inferInsert;
 export type PagesToNotebooksRecord = typeof pagesToNotebooks.$inferInsert;
 export type NotebooksToNotebooksRecord = typeof notebooksToNotebooks.$inferInsert;
+export type RefreshTokenRecords = typeof refreshTokens.$inferInsert;
