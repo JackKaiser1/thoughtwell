@@ -62,4 +62,4 @@ export type PageRecord = typeof pages.$inferInsert;
 export type NotebookRecord = typeof notebooks.$inferInsert;
 export type PagesToNotebooksRecord = typeof pagesToNotebooks.$inferInsert;
 export type NotebooksToNotebooksRecord = typeof notebooksToNotebooks.$inferInsert;
-export type RefreshTokenRecords = typeof refreshTokens.$inferInsert;
+export type RefreshTokenRecord = typeof refreshTokens.$inferInsert;
