@@ -1,9 +1,16 @@
 import { describe, it, expect } from "vitest";
 import { rollbackErrorHandler } from "../../lib/query-helpers.js";
 import { db } from "../../db/index.js";
-import { createNotebook, getNotebook, getNotebooks, deleteNotebook, deleteNotebooks, makeChildNotebook } from "../../db/queries/notebooks.js";
+import { createNotebook, 
+         getNotebook, 
+         getNotebooks, 
+         deleteNotebook, 
+         deleteNotebooks, 
+         makeChildNotebook,
+         getTopLevelNotebooks } from "../../db/queries/notebooks.js";
 import { createUser } from "../../db/queries/users.js";
 import { NotebookRecord } from "../../db/schema.js";
+import { makeChildren } from "../../lib/add-children.js";
 
 describe("createNotebook", () => {
     it("should create notebook record in db", async () => {
@@ -146,6 +153,41 @@ describe("makeChildNotebook", () => {
 
                 expect(notebookRecord.isChild).toEqual(false);
                 expect(updatedNotebookRecord.isChild).toEqual(true);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+});
+
+describe("getTopLevelNotebooks", () => {
+    it("should get only top level notebooks", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;   
+                
+                const notebook1: NotebookRecord = { notebookName: "First Notebook", userId: userId };
+                const notebookRecord1 = await createNotebook(tx, notebook1);
+
+                const notebook2: NotebookRecord = { notebookName: "Second Notebook", userId: userId };
+                const notebookRecord2 = await createNotebook(tx, notebook2);
+
+                const notebook3: NotebookRecord = { notebookName: "Third Notebook", userId: userId };
+                const notebookRecord3 = await createNotebook(tx, notebook3);
+
+                await makeChildren(tx, [notebookRecord2.id, notebookRecord3.id], makeChildNotebook);
+
+                const allNotebooks = await getNotebooks(tx, userId);
+
+                const topLevelNotebooks = await getTopLevelNotebooks(tx, userId);
+
+                expect(allNotebooks.length).toBeGreaterThan(topLevelNotebooks.length);
+                expect(topLevelNotebooks[0].id).toEqual(notebookRecord1.id);
+
 
                 tx.rollback();
             });
