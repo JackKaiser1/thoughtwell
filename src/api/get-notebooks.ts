@@ -3,7 +3,8 @@ import { NotebookRecord } from "../db/schema.js";
 import { BadRequestError } from "./errors.js";
 import { db } from "../db/index.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
-import { getNotebooks } from "../db/queries/notebooks.js";
+import { getNotebooks, getTopLevelNotebooks } from "../db/queries/notebooks.js";
+import { printProperties } from "../lib/print-properties.js";
 
 export async function handlerGetNotebooks(req: Request, res: Response) {
     const unverifiedUserId = req.query.userId;
@@ -25,4 +26,17 @@ function printNotebooks(notebooks: NotebookRecord[]) {
         console.log(notebook.notebookName);
     }
     console.log("---");
+}
+
+export async function handlerGetTopLevelNotebooks(req: Request, res: Response) {
+    const userId = verifyUUID(req.query.userId);
+
+    const topLevelNotebooks = await getTopLevelNotebooks(db, userId);
+    if (topLevelNotebooks.length < 1) {
+        throw new BadRequestError("no notebooks found for user");
+    }
+
+    printProperties(topLevelNotebooks, "notebookName");
+
+    res.status(200).json(topLevelNotebooks);
 }
