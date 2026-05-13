@@ -1,25 +1,28 @@
 import { BadRequestError } from "../api/errors.js";
 
 export type PageObj = {
-    userName: string;
     pageContent: string;
 }
 
-export function verifyPageData(pageObj: PageObj, limit: number) {
-    const content = pageObj.pageContent;
-    if (!content) {
-        throw new BadRequestError("page must have content");
+export function verifyPageData(page: PageObj, limit: number) {
+    if (!isPageData(page)) {
+        throw new BadRequestError("payload shape is invalid");
     }
 
-    const userName = pageObj.userName;
-    if (!userName) {
-        throw new BadRequestError("request must contain username");
-    }
-
-    const charCount = content.split("").length;
+    const charCount = page.pageContent.split("").length;
     if (charCount > limit) {
         throw new BadRequestError("note exceeds character limit");
     }
 
-    return pageObj;
+    return page;
 }
+
+export function isPageData(obj: unknown): obj is PageObj {
+    if (!(obj as PageObj).pageContent ||
+        typeof (obj as PageObj).pageContent !== "string" ) {
+
+            return false
+        } 
+
+    return true;
+} 

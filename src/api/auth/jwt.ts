@@ -32,7 +32,7 @@ export function verifyJWT(token: string, secret: string): string {
         
     } catch (err) {
         if (err instanceof Error) {
-            throw new BadRequestError("token has expired");
+            throw new BadRequestError("token has expired or is invalid");
         } else {
             throw new Error(`Error: ${err}`);
         }
