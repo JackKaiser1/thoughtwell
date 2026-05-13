@@ -15,6 +15,8 @@ import { handlerAddPagesToNotebook } from "./api/add-pages-notebook.js";
 import { handlerGetPagesOfNotebook } from "./api/get-pages-from-notebook.js";
 import { handlerAddNotebooksToNotebook } from "./api/add-notebooks-notebooks.js";
 import { handlerGetChildren } from "./api/get-notebooks-from-notebook.js";
+import { handlerRefresh } from "./api/refresh-access.js";
+import { authMiddleware } from "./api/middleware/auth-middleware.js";
 
 export const app = express();
 const PORT = 8080;
@@ -27,8 +29,13 @@ app.get("/api/readiness", async (req, res, next) => {
 });
 
 
+// tokens
+app.post("/api/refresh", async (req, res, next) => {
+    Promise.resolve(await handlerRefresh(req, res)).catch(next);
+});
+
 // pages
-app.post("/api/pages", async (req, res, next) => {
+app.post("/api/pages", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerCreatePage(req, res)).catch(next);
 });
 
