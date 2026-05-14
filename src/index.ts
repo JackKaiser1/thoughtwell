@@ -43,7 +43,7 @@ app.get("/api/pages/:pageId", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetPage(req, res)).catch(next);
 });
 
-app.get("/api/pages", async (req, res, next) => {
+app.get("/api/pages", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetPages(req, res)).catch(next);
 });
 

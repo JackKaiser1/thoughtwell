@@ -3,27 +3,17 @@ import { getPages, getPage, getLoosePages } from "../db/queries/pages.js";
 import { BadRequestError, NotFoundError, UnauthorizedError } from "./errors.js";
 import { db } from "../db/index.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
+import { printProperties } from "../lib/print-properties.js";
 
 export async function handlerGetPages(req: Request, res: Response) {
-    const userId = req.query.userId;
-    if (!userId) {
-        throw new BadRequestError("must provide user id as query parameter");
-    } else if (typeof userId !== "string") {
-        throw new BadRequestError("userId query parameter must be string");
-    }
-
-    verifyUUID(userId);
+    const userId = verifyUUID(res.locals.userId);
 
     const pageRecords = await getPages(db, userId);
-    if (!pageRecords.length) {
-        throw new NotFoundError("failed to fetch pages");
+    if (pageRecords.length < 1) {
+        throw new NotFoundError("Pages not found");
     }
 
-    console.log("---");
-    for (const page of pageRecords) {
-        console.log(page.pageContent);
-    }
-    console.log("---");
+    printProperties(pageRecords, "pageContent");
 
     res.status(200).json(pageRecords);
 }
