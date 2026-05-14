@@ -39,7 +39,7 @@ app.post("/api/pages", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerCreatePage(req, res)).catch(next);
 });
 
-app.get("/api/pages/:pageId", async (req, res, next) => {
+app.get("/api/pages/:pageId", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetPage(req, res)).catch(next);
 });
 

@@ -5,7 +5,7 @@ import { BadRequestError } from "../errors.js";
 
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
     if (!req.headers.authorization) {
-        throw new BadRequestError("request must provide access token in header");
+        throw new BadRequestError("Must provide access token in header");
     }
     const token = getBearerToken(req.headers.authorization);
 

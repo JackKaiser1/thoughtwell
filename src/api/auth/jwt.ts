@@ -3,13 +3,13 @@ import { BadRequestError } from "../errors.js";
 
 export type JWTPayload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
-export function createJWT(userId: string, expiresIn: number, secret: string): string {
+export function createJWT(userId: string, expiresInS: number, secret: string): string {
     const issuedAt = Math.floor(Date.now() / 1000);
     const payload: JWTPayload = {
         iss: "ThoughtWell",
         sub: userId,
         iat: issuedAt,
-        exp: issuedAt + expiresIn
+        exp: issuedAt + expiresInS
     };
 
     return jwt.sign(payload, secret);

@@ -9,6 +9,8 @@ import { setupRefreshToken } from "./auth/refresh.js";
 import { createRefreshToken } from "../db/queries/refresh-tokens.js";
 import { createJWT } from "./auth/jwt.js";
 import { config } from "../config.js";
+import { OneHourS, SixtyDaysMs } from "./api-constants.js";
+
 
 export type UserRequestData = {
     userName: string,
@@ -31,12 +33,10 @@ export async function handlerLogin(req: Request, res: Response): Promise<void> {
     const hash = userRecord.hashedPassword;
     await verifyHash(hash, userLogin.password);
 
-    const sixtyDaysMs = 5.184e+9;
-    const refreshTokenQuery = setupRefreshToken(userRecord.id, sixtyDaysMs);
+    const refreshTokenQuery = setupRefreshToken(userRecord.id, SixtyDaysMs);
     const refreshTokenRecord = await createRefreshToken(db, refreshTokenQuery);
 
-    const oneHourMs = 3.6e+6;
-    const accessToken = createJWT(userRecord.id, oneHourMs, config.secret);
+    const accessToken = createJWT(userRecord.id, OneHourS, config.secret);
 
     const safeUserRecord: SafeUserWithToken = {
         id: userRecord.id,
