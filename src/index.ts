@@ -47,7 +47,7 @@ app.get("/api/pages", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetPages(req, res)).catch(next);
 });
 
-app.delete("/api/pages/:pageId", async (req, res, next) => {
+app.delete("/api/pages/:pageId", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerDeletePage(req, res)).catch(next);
 });
 
