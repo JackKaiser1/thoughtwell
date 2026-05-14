@@ -98,7 +98,7 @@ app.get("/api/notebooks/all", async (req, res, next) => {
     Promise.resolve(await handlerGetNotebooks(req, res)).catch(next);
 });
 
-app.post("/api/addPages", async (req, res, next) => {
+app.post("/api/notebooks/addPages", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerAddPagesToNotebook(req, res)).catch(next);
 });
 
