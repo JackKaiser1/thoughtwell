@@ -1,29 +1,19 @@
 import { Request, Response } from "express";
 import { getPages, getPage, getLoosePages } from "../db/queries/pages.js";
-import { BadRequestError, NotFoundError } from "./errors.js";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "./errors.js";
 import { db } from "../db/index.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
+import { printProperties } from "../lib/print-properties.js";
 
 export async function handlerGetPages(req: Request, res: Response) {
-    const userId = req.query.userId;
-    if (!userId) {
-        throw new BadRequestError("must provide user id as query parameter");
-    } else if (typeof userId !== "string") {
-        throw new BadRequestError("userId query parameter must be string");
-    }
-
-    verifyUUID(userId);
+    const userId = verifyUUID(res.locals.userId);
 
     const pageRecords = await getPages(db, userId);
-    if (!pageRecords.length) {
-        throw new NotFoundError("failed to fetch pages");
+    if (pageRecords.length < 1) {
+        throw new NotFoundError("Pages not found");
     }
 
-    console.log("---");
-    for (const page of pageRecords) {
-        console.log(page.pageContent);
-    }
-    console.log("---");
+    printProperties(pageRecords, "pageContent");
 
     res.status(200).json(pageRecords);
 }
@@ -31,36 +21,36 @@ export async function handlerGetPages(req: Request, res: Response) {
 export async function handlerGetPage(req: Request, res: Response) {
     const pageId = req.params.pageId;
     if (!pageId) {
-        throw new BadRequestError("must provide page id as path parameter");
+        throw new BadRequestError("Must provide page Id as path parameter");
     } else if (typeof pageId !== "string") {
-        throw new BadRequestError("pageId parameter must be string");
+        throw new BadRequestError("Page Id must be a string");
     }
 
     verifyUUID(pageId);
 
     const pageRecord = await getPage(db, pageId);
     if (!pageRecord) {
-        throw new NotFoundError("page not found");
+        throw new NotFoundError("Page not found");
+    } 
+    
+    const userId = verifyUUID(res.locals.userId);
+    const pageUserId = pageRecord.userId;
+    if (userId !== pageUserId) {
+        throw new UnauthorizedError("User is not authorized to this resource");
     }
 
     res.status(200).json(pageRecord);
 }
 
 export async function handlerGetLoosePages(req: Request, res: Response) {
-    const unverifiedUserId = req.query.userId;
-    const userId = verifyUUID(unverifiedUserId);
+    const userId = verifyUUID(res.locals.userId);
 
     const loosePageRecords = await getLoosePages(db, userId);
     if (loosePageRecords.length < 1) {
-        throw new NotFoundError("No loose pages found for user");
+        throw new NotFoundError("Loose pages not found");
     }
 
-    console.log("---");
-    for (const page of loosePageRecords) {
-        console.log(page.pageContent);
-    }
-    console.log("---");
-
+    printProperties(loosePageRecords, "pageContent");
 
     res.status(200).json(loosePageRecords);
 }

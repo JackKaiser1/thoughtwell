@@ -39,21 +39,22 @@ app.post("/api/pages", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerCreatePage(req, res)).catch(next);
 });
 
-app.get("/api/pages/:pageId", async (req, res, next) => {
+app.get("/api/pages/:pageId", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetPage(req, res)).catch(next);
 });
 
-app.get("/api/pages", async (req, res, next) => {
+app.get("/api/loosePages", authMiddleware, async (req, res, next) => {
+    Promise.resolve(await handlerGetLoosePages(req, res)).catch(next);
+}); 
+
+app.get("/api/pages", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetPages(req, res)).catch(next);
 });
 
-app.delete("/api/pages/:pageId", async (req, res, next) => {
+app.delete("/api/pages/:pageId", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerDeletePage(req, res)).catch(next);
 });
 
-app.get("/api/loosePages", async (req, res, next) => {
-    Promise.resolve(await handlerGetLoosePages(req, res)).catch(next);
-});
 
 
 // users
@@ -61,33 +62,35 @@ app.post("/api/users", async (req, res, next) => {
     Promise.resolve(await handlerCreateUser(req, res)).catch(next);
 });
 
-app.delete("/api/users", async (req, res, next) => {
-    Promise.resolve(await handlerDeleteUsers(req, res)).catch(next);
+app.post("/api/login", async (req, res, next) => {
+    Promise.resolve(await handlerLogin(req, res)).catch(next);
 });
 
-app.delete("/api/users/:userId", async (req, res, next) => {
-    Promise.resolve(await handlerDeleteUser(req, res)).catch(next);
+app.get("/api/users/:userId", authMiddleware, async (req, res, next) => {
+    Promise.resolve(await handlerGetUser(req, res)).catch(next);
 });
 
 app.get("/api/users", async (req, res, next) => {
     Promise.resolve(await handlerGetUsers(req, res)).catch(next);
 });
 
-app.get("/api/users/:userId", async (req, res, next) => {
-    Promise.resolve(await handlerGetUser(req, res)).catch(next);
+app.delete("/api/users/:userId", authMiddleware, async (req, res, next) => {
+    Promise.resolve(await handlerDeleteUser(req, res)).catch(next);
 });
 
-app.post("/api/login", async (req, res, next) => {
-    Promise.resolve(await handlerLogin(req, res)).catch(next);
+app.delete("/api/users", async (req, res, next) => {
+    Promise.resolve(await handlerDeleteUsers(req, res)).catch(next);
 });
+ 
+
 
 
 // notebooks
-app.post("/api/notebooks", async (req, res, next) => {
+app.post("/api/notebooks", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerCreateNotebook(req, res)).catch(next);
 });
 
-app.get("/api/notebooks", async (req, res, next) => {
+app.get("/api/notebooks", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetTopLevelNotebooks(req, res)).catch(next);
 });
 
@@ -95,7 +98,7 @@ app.get("/api/notebooks/all", async (req, res, next) => {
     Promise.resolve(await handlerGetNotebooks(req, res)).catch(next);
 });
 
-app.post("/api/addPages", async (req, res, next) => {
+app.post("/api/notebooks/addPages", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerAddPagesToNotebook(req, res)).catch(next);
 });
 

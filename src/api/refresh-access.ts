@@ -3,7 +3,7 @@ import { BadRequestError } from "./errors.js";
 import { createJWT, getBearerToken } from "./auth/jwt.js";
 import { getRefreshToken } from "../db/queries/refresh-tokens.js";
 import { db } from "../db/index.js";
-import { OneHourMs } from "./api-constants.js";
+import { OneHourS } from "./api-constants.js";
 import { config } from "../config.js";
 
 export async function handlerRefresh(req: Request, res: Response) {
@@ -28,7 +28,7 @@ export async function handlerRefresh(req: Request, res: Response) {
     }
 
     const userId = refreshTokenRecord.userId;
-    const newAccessToken = createJWT(userId, OneHourMs, config.secret);
+    const newAccessToken = createJWT(userId, OneHourS, config.secret);
 
     res.status(201).json({accessToken: newAccessToken});
 }

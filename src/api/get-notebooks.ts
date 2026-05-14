@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { NotebookRecord } from "../db/schema.js";
-import { BadRequestError } from "./errors.js";
+import { BadRequestError, NotFoundError } from "./errors.js";
 import { db } from "../db/index.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
 import { getNotebooks, getTopLevelNotebooks } from "../db/queries/notebooks.js";
@@ -29,11 +29,11 @@ function printNotebooks(notebooks: NotebookRecord[]) {
 }
 
 export async function handlerGetTopLevelNotebooks(req: Request, res: Response) {
-    const userId = verifyUUID(req.query.userId);
+    const userId = verifyUUID(res.locals.userId);
 
     const topLevelNotebooks = await getTopLevelNotebooks(db, userId);
     if (topLevelNotebooks.length < 1) {
-        throw new BadRequestError("no notebooks found for user");
+        throw new NotFoundError("Notebooks not found");
     }
 
     printProperties(topLevelNotebooks, "notebookName");

@@ -14,9 +14,9 @@ export function generateRefreshToken(): string {
     }
 }
 
-export function setupRefreshToken(userId: string, expiresIn: number): RefreshTokenQuery {
+export function setupRefreshToken(userId: string, expiresInMS: number): RefreshTokenQuery {
     const now = Date.now();
-    const expiresAt = new Date(now + expiresIn);
+    const expiresAt = new Date(now + expiresInMS);
 
     const token = generateRefreshToken();
     return {

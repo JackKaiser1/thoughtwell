@@ -4,7 +4,7 @@ export type PageObj = {
     pageContent: string;
 }
 
-export function verifyPageData(page: PageObj, limit: number) {
+export function verifyPageData(page: unknown, limit: number) {
     if (!isPageData(page)) {
         throw new BadRequestError("payload shape is invalid");
     }
@@ -18,11 +18,9 @@ export function verifyPageData(page: PageObj, limit: number) {
 }
 
 export function isPageData(obj: unknown): obj is PageObj {
-    if (!(obj as PageObj).pageContent ||
-        typeof (obj as PageObj).pageContent !== "string" ) {
-
-            return false
-        } 
+    if (!(obj as PageObj).pageContent || typeof (obj as PageObj).pageContent !== "string" ) {
+        return false
+    } 
 
     return true;
 } 
