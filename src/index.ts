@@ -90,7 +90,7 @@ app.post("/api/notebooks", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerCreateNotebook(req, res)).catch(next);
 });
 
-app.get("/api/notebooks", async (req, res, next) => {
+app.get("/api/notebooks", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetTopLevelNotebooks(req, res)).catch(next);
 });
 
