@@ -86,7 +86,7 @@ app.delete("/api/users", async (req, res, next) => {
 
 
 // notebooks
-app.post("/api/notebooks", async (req, res, next) => {
+app.post("/api/notebooks", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerCreateNotebook(req, res)).catch(next);
 });
 
