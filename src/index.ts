@@ -62,6 +62,10 @@ app.post("/api/users", async (req, res, next) => {
     Promise.resolve(await handlerCreateUser(req, res)).catch(next);
 });
 
+app.post("/api/login", async (req, res, next) => {
+    Promise.resolve(await handlerLogin(req, res)).catch(next);
+});
+
 app.get("/api/users/:userId", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetUser(req, res)).catch(next);
 });
@@ -70,18 +74,15 @@ app.get("/api/users", async (req, res, next) => {
     Promise.resolve(await handlerGetUsers(req, res)).catch(next);
 });
 
-app.delete("/api/users/:userId", async (req, res, next) => {
+app.delete("/api/users/:userId", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerDeleteUser(req, res)).catch(next);
 });
 
 app.delete("/api/users", async (req, res, next) => {
     Promise.resolve(await handlerDeleteUsers(req, res)).catch(next);
 });
-
  
-app.post("/api/login", async (req, res, next) => {
-    Promise.resolve(await handlerLogin(req, res)).catch(next);
-});
+
 
 
 // notebooks
