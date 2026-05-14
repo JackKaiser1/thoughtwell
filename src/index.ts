@@ -43,6 +43,10 @@ app.get("/api/pages/:pageId", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetPage(req, res)).catch(next);
 });
 
+app.get("/api/loosePages", authMiddleware, async (req, res, next) => {
+    Promise.resolve(await handlerGetLoosePages(req, res)).catch(next);
+}); 
+
 app.get("/api/pages", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetPages(req, res)).catch(next);
 });
@@ -51,9 +55,6 @@ app.delete("/api/pages/:pageId", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerDeletePage(req, res)).catch(next);
 });
 
-app.get("/api/loosePages", async (req, res, next) => {
-    Promise.resolve(await handlerGetLoosePages(req, res)).catch(next);
-});
 
 
 // users

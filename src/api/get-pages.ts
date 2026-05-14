@@ -43,20 +43,14 @@ export async function handlerGetPage(req: Request, res: Response) {
 }
 
 export async function handlerGetLoosePages(req: Request, res: Response) {
-    const unverifiedUserId = req.query.userId;
-    const userId = verifyUUID(unverifiedUserId);
+    const userId = verifyUUID(res.locals.userId);
 
     const loosePageRecords = await getLoosePages(db, userId);
     if (loosePageRecords.length < 1) {
-        throw new NotFoundError("No loose pages found for user");
+        throw new NotFoundError("Loose pages not found");
     }
 
-    console.log("---");
-    for (const page of loosePageRecords) {
-        console.log(page.pageContent);
-    }
-    console.log("---");
-
+    printProperties(loosePageRecords, "pageContent");
 
     res.status(200).json(loosePageRecords);
 }
