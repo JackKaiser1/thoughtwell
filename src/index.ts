@@ -110,7 +110,7 @@ app.post("/api/notebooks/addNotebooks", async (req, res, next) => {
     Promise.resolve(await handlerAddNotebooksToNotebook(req, res)).catch(next);
 });
 
-app.get("/api/notebooks/:notebookId/children", async (req, res, next) => {
+app.get("/api/notebooks/:notebookId/children", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetChildren(req, res)).catch(next);
 });
 
