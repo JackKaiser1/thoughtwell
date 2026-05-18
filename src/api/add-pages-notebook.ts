@@ -6,27 +6,24 @@ import { verifyUUID } from "../lib/verify-uuid.js";
 import { type PageRecord, type PagesToNotebooksRecord, pages } from "../db/schema.js";
 import { makeChildPage } from "../db/queries/pages.js";
 import { addChildrenToNotebook } from "../lib/add-children.js";
-
-// export type PagesToAdd = {
-//     pageIds: string[];
-//     userId: string;
-//     notebookId: string;
-// }
+import { verifyChildrenToAdd } from "../lib/verify-childrenToAdd.js";
 
 export async function handlerAddPagesToNotebook(req: Request, res: Response) {
-    const userId = req.body.userId;
-    if (!userId) {
-        throw new BadRequestError("Payload must contain userId property");
-    } else if (typeof userId !== "string") {
-        throw new BadRequestError("UserId must be a string");
-    }
+    // const userId = req.body.userId;
+    // if (!userId) {
+    //     throw new BadRequestError("Payload must contain userId property");
+    // } else if (typeof userId !== "string") {
+    //     throw new BadRequestError("UserId must be a string");
+    // }
 
     const authenticatedUserId = verifyUUID(res.locals.userId);
-    if (authenticatedUserId !== userId) {
-        throw new UnauthorizedError("Not authorized to edit notebook");
-    }
+    const authorizedPayload = await verifyChildrenToAdd(db, req.body, authenticatedUserId);
 
-    const childParentRecords = await addChildrenToNotebook(db, req.body, deletePagesToNotebooks, createPagesToNotebooks, makeChildPage);
+    // if (authenticatedUserId !== userId) {
+    //     throw new UnauthorizedError("Not authorized to edit notebook");
+    // }
+
+    const childParentRecords = await addChildrenToNotebook(db, authorizedPayload, deletePagesToNotebooks, createPagesToNotebooks, makeChildPage);
 
     for (const element of childParentRecords) {
         if (!element) {

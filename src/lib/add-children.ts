@@ -28,13 +28,13 @@ type DeleteQuery = typeof deletePagesToNotebooks | typeof deleteNotebooksToNoteb
 
 
 export async function addChildrenToNotebook(client: dbClient, 
-                               payload: unknown,
+                               payload: ChildrenToAdd,
                                deleteQueryFunc: DeleteQuery,
                                addChildrenQueryFunc: typeof createPagesToNotebooks,
                                makeChildrenQueryFunc: typeof makeChildPage): Promise<PagesToNotebooksRecord[]>;
 
 export async function addChildrenToNotebook(client: dbClient, 
-                               payload: unknown,
+                               payload: ChildrenToAdd,
                                deleteQueryFunc: DeleteQuery,
                                addChildrenQueryFunc: typeof createNotebooksToNotebooks,
                                makeChildrenQueryFunc: typeof makeChildNotebook): Promise<NotebooksToNotebooksRecord[]>;
@@ -42,63 +42,63 @@ export async function addChildrenToNotebook(client: dbClient,
 
 
 export async function addChildrenToNotebook(client: dbClient, 
-                                            payload: unknown, 
+                                            payload: ChildrenToAdd, 
                                             deleteQueryFunc: DeleteQuery,
                                             addChildrenQueryFunc: AddChildrenQueryFunc,
                                             makeChildrenQueryFunc: makeChildQueryFunc) {
                                                 
-    const childrenToAdd = verifyChildrenToAdd(payload);
-    await removePriorRelationships(client, deleteQueryFunc, childrenToAdd);
-    const childParentRecords = await addChildrenQuery(client, childrenToAdd, addChildrenQueryFunc);
-    await makeChildren(client, childrenToAdd.childIds, makeChildrenQueryFunc);
+    // const childrenToAdd = verifyChildrenToAdd(payload);
+    await removePriorRelationships(client, deleteQueryFunc, payload);
+    const childParentRecords = await addChildrenQuery(client, payload, addChildrenQueryFunc);
+    await makeChildren(client, payload.childIds, makeChildrenQueryFunc);
 
     return childParentRecords
 }
 
 
 
-export function verifyChildrenToAdd(childrenToAdd: unknown): ChildrenToAdd {
-    if (!isChildrenToAdd(childrenToAdd)) {
-        throw new BadRequestError("payload is invalid type");
-    }
+// export function verifyChildrenToAdd(childrenToAdd: unknown): ChildrenToAdd {
+//     if (!isChildrenToAdd(childrenToAdd)) {
+//         throw new BadRequestError("payload is invalid type");
+//     }
 
-    const typeOfChild = childrenToAdd.typeOfChild;
-    const userId = verifyUUID(childrenToAdd.userId);
-    const notebookId = verifyUUID(childrenToAdd.notebookId);
+//     const typeOfChild = childrenToAdd.typeOfChild;
+//     const userId = verifyUUID(childrenToAdd.userId);
+//     const notebookId = verifyUUID(childrenToAdd.notebookId);
 
-    const childIds: string[] = [];
-    for (const id of childrenToAdd.childIds) {
-        const childId = verifyUUID(id);
-        childIds.push(childId);
-    }
+//     const childIds: string[] = [];
+//     for (const id of childrenToAdd.childIds) {
+//         const childId = verifyUUID(id);
+//         childIds.push(childId);
+//     }
 
-    return {
-        typeOfChild: typeOfChild,
-        userId: userId,
-        notebookId: notebookId,
-        childIds: childIds,
-    }
-}
+//     return {
+//         typeOfChild: typeOfChild,
+//         userId: userId,
+//         notebookId: notebookId,
+//         childIds: childIds,
+//     }
+// }
 
 
-export function isChildrenToAdd(obj: unknown): obj is ChildrenToAdd {
-    if ((obj as ChildrenToAdd).userId === undefined) return false;
-    if ((obj as ChildrenToAdd).notebookId === undefined) return false;
-    if ((obj as ChildrenToAdd).typeOfChild === undefined) return false;
-    if ((obj as ChildrenToAdd).childIds === undefined) return false;
+// export function isChildrenToAdd(obj: unknown): obj is ChildrenToAdd {
+//     if ((obj as ChildrenToAdd).userId === undefined) return false;
+//     if ((obj as ChildrenToAdd).notebookId === undefined) return false;
+//     if ((obj as ChildrenToAdd).typeOfChild === undefined) return false;
+//     if ((obj as ChildrenToAdd).childIds === undefined) return false;
     
-    if (typeof (obj as ChildrenToAdd).userId !== "string") return false
-    if (typeof (obj as ChildrenToAdd).notebookId !== "string") return false;
-    if ((obj as ChildrenToAdd).typeOfChild !== "pages" &&
-        (obj as ChildrenToAdd).typeOfChild !== "notebooks") return false; 
+//     if (typeof (obj as ChildrenToAdd).userId !== "string") return false
+//     if (typeof (obj as ChildrenToAdd).notebookId !== "string") return false;
+//     if ((obj as ChildrenToAdd).typeOfChild !== "pages" &&
+//         (obj as ChildrenToAdd).typeOfChild !== "notebooks") return false; 
 
-    for (const id of (obj as ChildrenToAdd).childIds) {
-        if (id === undefined) return false;
-        if (typeof id !== "string") return false;
-    }
+//     for (const id of (obj as ChildrenToAdd).childIds) {
+//         if (id === undefined) return false;
+//         if (typeof id !== "string") return false;
+//     }
 
-    return true;
-}
+//     return true;
+// }
 
 
 export async function removePriorRelationships(client: dbClient, deleteQuery: DeleteQuery, childrenToAdd: ChildrenToAdd) {
