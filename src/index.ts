@@ -106,7 +106,7 @@ app.get("/api/notebooks/:notebookId/pages", authMiddleware, async (req, res, nex
     Promise.resolve(await handlerGetPagesOfNotebook(req, res)).catch(next);
 });
 
-app.post("/api/notebooks/addNotebooks", async (req, res, next) => {
+app.post("/api/notebooks/addNotebooks", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerAddNotebooksToNotebook(req, res)).catch(next);
 });
 
