@@ -102,15 +102,15 @@ app.post("/api/notebooks/addPages", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerAddPagesToNotebook(req, res)).catch(next);
 });
 
-app.get("/api/notebooks/:notebookId/pages", async (req, res, next) => {
+app.get("/api/notebooks/:notebookId/pages", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetPagesOfNotebook(req, res)).catch(next);
 });
 
-app.post("/api/notebooks/addNotebooks", async (req, res, next) => {
+app.post("/api/notebooks/addNotebooks", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerAddNotebooksToNotebook(req, res)).catch(next);
 });
 
-app.get("/api/notebooks/:notebookId/children", async (req, res, next) => {
+app.get("/api/notebooks/:notebookId/children", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetChildren(req, res)).catch(next);
 });
 

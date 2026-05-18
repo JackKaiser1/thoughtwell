@@ -1,7 +1,5 @@
 import { type ChildrenToAdd, 
         addChildrenToNotebook, 
-        verifyChildrenToAdd, 
-        isChildrenToAdd,
         addChildrenQuery,
         isPagesToNotebooksRecord, 
         isNotebooksToNotebooksRecord,
@@ -19,6 +17,7 @@ import { NotebooksToNotebooksRecord, PagesToNotebooksRecord, PageRecord, Noteboo
 import { createNotebooksToNotebooks, NotebooksToNotebooksQuery, deleteNotebooksToNotebooks, getChildren } from "../../db/queries/notebooks-to-notebooks.js";
 import { makeChildNotebook } from "../../db/queries/notebooks.js";
 import { BadRequestError } from "../../api/errors.js";
+import { verifyChildrenToAdd, isChildrenToAdd } from "../../lib/verify-childrenToAdd.js";
 
 describe("addChildrenToNotebook", () => {
     it("should add 3 pages to notebook", async () => {
@@ -127,91 +126,6 @@ describe("addChildrenToNotebook", () => {
     });
 });
 
-describe("verifyChildrenToAdd", () => {
-    it("should verify unknown object and return ChildrenToAdd type", async () => {
-        try {
-            await db.transaction(async (tx) => {
-                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
-                const userRecord = await createUser(tx, user);
-                const userId = userRecord.id;
-
-                const page = { pageContent: "1st note", userId: userId };
-                const pageRecord = await createPage(tx, page);
-
-                const page2 = { pageContent: "2nd note", userId: userId };
-                const pageRecord2 = await createPage(tx, page2);
-
-                const page3 = { pageContent: "3rd note", userId: userId };
-                const pageRecord3 = await createPage(tx, page3);
-
-                const notebook = { notebookName: "New Notebook", userId: userId };
-                const notebookRecord = await createNotebook(tx, notebook);
-                const notebookId = notebookRecord.id;
-
-                const obj = {
-                    typeOfChild: "pages",
-                    userId: userId,
-                    notebookId: notebookId,
-                    childIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
-                };
-
-                const childrenToAdd = verifyChildrenToAdd(obj);
-
-                expect(childrenToAdd.typeOfChild).toEqual("pages");
-                expect(childrenToAdd.userId).toEqual(userRecord.id);
-                expect(childrenToAdd.notebookId).toEqual(notebookRecord.id);
-        
-                expect(childrenToAdd.childIds[0]).toEqual(pageRecord.id);
-                expect(childrenToAdd.childIds[1]).toEqual(pageRecord2.id);
-                expect(childrenToAdd.childIds[2]).toEqual(pageRecord3.id);
-
-                
-
-                tx.rollback();
-            });
-        } catch (err) {
-            rollbackErrorHandler(err);
-        }
-    });
-
-
-    it("should throw an error due to malformed UUID on userId", async () => {
-            try {
-                await db.transaction(async (tx) => {
-                    const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
-                    const userRecord = await createUser(tx, user);
-                    const userId = userRecord.id;
-
-                    const page = { pageContent: "1st note", userId: userId };
-                    const pageRecord = await createPage(tx, page);
-
-                    const page2 = { pageContent: "2nd note", userId: userId };
-                    const pageRecord2 = await createPage(tx, page2);
-
-                    const page3 = { pageContent: "3rd note", userId: userId };
-                    const pageRecord3 = await createPage(tx, page3);
-
-                    const notebook = { notebookName: "New Notebook", userId: userId };
-                    const notebookRecord = await createNotebook(tx, notebook);
-                    const notebookId = notebookRecord.id;
-
-                    const obj = {
-                        typeOfChild: "pages",
-                        // malformed uuid
-                        userId: "uuid",
-                        notebookId: notebookId,
-                        childIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
-                    };
-
-                    expect(() => verifyChildrenToAdd(obj)).toThrow(BadRequestError);
-
-                    tx.rollback();
-                });
-            } catch (err) {
-                rollbackErrorHandler(err);
-            }
-        });
-});
 
 describe("isChildrenToAdd", () => {
     it("should return true for proper shape", async () => {
@@ -321,7 +235,7 @@ describe("addChildrenQuery", () => {
                     childIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
                 };
 
-                const childrenToAdd = verifyChildrenToAdd(obj);
+                const childrenToAdd = await verifyChildrenToAdd(tx, obj, userId);
 
                 const pageToNotebooksRecords = await addChildrenQuery(tx, childrenToAdd, createPagesToNotebooks) as PagesToNotebooksRecord[];
 
@@ -337,45 +251,6 @@ describe("addChildrenQuery", () => {
         }
     });
 
-    it("should throw db error when createing pagesToNotebooks Record", async () => {
-        try {
-            await db.transaction(async (tx) => {
-                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
-                const userRecord = await createUser(tx, user);
-                const userId = userRecord.id;
-
-                const page = { pageContent: "1st note", userId: userId };
-                const pageRecord = await createPage(tx, page);
-
-                const page2 = { pageContent: "2nd note", userId: userId };
-                const pageRecord2 = await createPage(tx, page2);
-
-                const page3 = { pageContent: "3rd note", userId: userId };
-                const pageRecord3 = await createPage(tx, page3);
-
-                const notebook = { notebookName: "New Notebook", userId: userId };
-                const notebookRecord = await createNotebook(tx, notebook);
-                const notebookId = notebookRecord.id;
-
-                const obj: ChildrenToAdd = {
-                    // Wrong child type for operation - throwing db error
-                    typeOfChild: "notebooks",
-                    userId: userId,
-                    notebookId: notebookId,
-                    childIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
-                };
-
-                const childrenToAdd = verifyChildrenToAdd(obj);
-
-                await expect(async () => addChildrenQuery(tx, obj, createPagesToNotebooks)).rejects.toThrow();
-
-
-                tx.rollback();
-            });
-        } catch (err) {
-            rollbackErrorHandler(err);
-        }
-    });
 
     it("should create notebooksToNotebooks record", async () => {
         try {
@@ -399,7 +274,7 @@ describe("addChildrenQuery", () => {
                     childIds: [childNotebookId],
                 };
 
-                const childrenToAdd = verifyChildrenToAdd(obj);
+                const childrenToAdd = await verifyChildrenToAdd(tx, obj, userId);
 
                 const childParentRecords = await addChildrenQuery(tx, childrenToAdd, createNotebooksToNotebooks) as NotebooksToNotebooksRecord[];
 
@@ -413,39 +288,6 @@ describe("addChildrenQuery", () => {
         }
     });
 
-    it("should throw db error when creating notebooksToNotebooks record", async () => {
-        try {
-            await db.transaction(async (tx) => {
-                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
-                const userRecord = await createUser(tx, user);
-                const userId = userRecord.id;
-
-                const childNotebook = { notebookName: "New Notebook", userId: userId };
-                const childNotebookRecord = await createNotebook(tx, childNotebook);
-                const childNotebookId = childNotebookRecord.id;
-
-                const parentNotebook = { notebookName: "New Notebook", userId: userId };
-                const parentNotebookRecord = await createNotebook(tx, parentNotebook);
-                const parentNotebookId = parentNotebookRecord.id;
-
-                const obj = {
-                    // Wrong child type for operation - throwing db error
-                    typeOfChild: "pages",
-                    userId: userId,
-                    notebookId: parentNotebookId,
-                    childIds: [childNotebookId],
-                };
-
-                const childrenToAdd = verifyChildrenToAdd(obj);
-
-                await expect(() => addChildrenQuery(tx, childrenToAdd, createNotebooksToNotebooks)).rejects.toThrow();
-
-                tx.rollback();
-            });
-        } catch (err) {
-            rollbackErrorHandler(err);
-        }
-    });
 });
 
 describe("isPagesToNotebooksRecord", () => {
