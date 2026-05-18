@@ -2,7 +2,7 @@ import { BadRequestError, UnauthorizedError } from "../api/errors.js";
 import { verifyUUID } from "./verify-uuid.js";
 import { type ChildrenToAdd } from "./add-children.js";
 import { getNotebook } from "../db/queries/notebooks.js";
-import { db, dbClient } from "../db/index.js";
+import { type dbClient } from "../db/index.js";
 import { type PageRecord } from "../db/schema.js";
 import { getPage } from "../db/queries/pages.js";
 
@@ -50,7 +50,7 @@ export async function authorizeNotebookEdit(client: dbClient, childrenToAdd: Chi
         throw new UnauthorizedError(errMessage);
     }
  
-    const notebookRecord = await getNotebook(db, notebookId);
+    const notebookRecord = await getNotebook(client, notebookId);
     if (authenticatedUserId !== notebookRecord.userId) {
         throw new UnauthorizedError(errMessage);
     }
@@ -68,8 +68,12 @@ export async function authorizeNotebookEdit(client: dbClient, childrenToAdd: Chi
     }
 
     const childRecords = await Promise.all(queryPromises);
-
     for (const record of childRecords) {
+        
+        if (record === undefined) {
+            throw new BadRequestError("typeOfChild property is incorrect");
+        }
+
         if (authenticatedUserId !== record.userId) {
             throw new UnauthorizedError(errMessage);
         }
