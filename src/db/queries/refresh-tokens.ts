@@ -31,3 +31,12 @@ export async function revokeRefreshToken(client: dbClient, token: string) {
     return refreshTokenRecord;
 
 }
+
+export async function revokeAllRefreshTokens(client: dbClient, userId: string) {
+    const refreshTokenRecords = await client
+                                            .update(refreshTokens)
+                                            .set({ revokedAt: new Date() })
+                                            .where(eq(refreshTokens.userId, userId))
+                                            .returning();
+    return refreshTokenRecords;
+}

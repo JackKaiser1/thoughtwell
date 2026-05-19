@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { createRefreshToken, getRefreshToken, revokeRefreshToken } from "../../db/queries/refresh-tokens.ts";
+import { createRefreshToken, getRefreshToken, revokeRefreshToken, revokeAllRefreshTokens } from "../../db/queries/refresh-tokens.ts";
 import { rollbackErrorHandler } from "../../lib/query-helpers.js";
 import { db } from "../../db/index.js";
 import { generateRefreshToken, setupRefreshToken } from "../../api/auth/refresh.ts";
@@ -59,7 +59,7 @@ describe("getRefreshToken", () => {
     });
 });
 
-describe("revokeRefreshToken", () => {
+describe("revokeRefreshToken / revokeAllRefreshTokens", () => {
     it("should revoke refresh token", async () => {
         try {
             await db.transaction(async (tx) => {
@@ -77,6 +77,31 @@ describe("revokeRefreshToken", () => {
                 const refreshTokenRecord = await getRefreshToken(tx, token);
 
                 expect(refreshTokenRecord.revokedAt).toBeTruthy();
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+
+    it("should revoke all refresh tokens", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;
+
+                const refreshTokenQuery = setupRefreshToken(userId, 5.184e+9);
+                await createRefreshToken(tx, refreshTokenQuery);
+
+                const refreshTokenQuery2 = setupRefreshToken(userId, 5.184e+9);
+                await createRefreshToken(tx, refreshTokenQuery2);
+
+                const revokedRefreshTokenRecords = await revokeAllRefreshTokens(tx, userId);
+
+                expect(revokedRefreshTokenRecords[0].revokedAt).toBeTruthy();
+                expect(revokedRefreshTokenRecords[1].revokedAt).toBeTruthy();
 
                 tx.rollback();
             });
