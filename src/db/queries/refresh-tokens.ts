@@ -23,8 +23,11 @@ export async function getRefreshToken(client: dbClient, token: string) {
 }
 
 export async function revokeRefreshToken(client: dbClient, token: string) {
-    await client
-                .update(refreshTokens)
-                .set({ revokedAt: new Date() })
-                .where(eq(refreshTokens.token, token));
+    const [refreshTokenRecord] = await client
+                                            .update(refreshTokens)
+                                            .set({ revokedAt: new Date() })
+                                            .where(eq(refreshTokens.token, token))
+                                            .returning();
+    return refreshTokenRecord;
+
 }
