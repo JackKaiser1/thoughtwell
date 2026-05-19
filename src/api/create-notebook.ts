@@ -5,22 +5,19 @@ import { createNotebook } from "../db/queries/notebooks.js";
 import { BadRequestError, NotFoundError } from "./errors.js";
 import { db } from "../db/index.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
+import { NotebookNameCharLimit } from "./api-constants.js";
 
-type NotebookRequest = {
+export type NotebookRequest = {
     notebookName: string;  
 }
 
 export async function handlerCreateNotebook(req: Request, res: Response) {
-    const notebookReq = req.body;
-    if (!notebookReq.notebookName) {
-        throw new BadRequestError("Notebook must have a name");
-    }
-
+    const notebookRequest = verifyNotebook(req.body);
     const userId = verifyUUID(res.locals.userId);
 
     const notebookQuery: NotebookRecord = {
         userId: userId,
-        notebookName: notebookReq.notebookName,
+        notebookName: notebookRequest.notebookName,
     }
 
     const notebookRecord = await createNotebook(db, notebookQuery);
@@ -29,4 +26,24 @@ export async function handlerCreateNotebook(req: Request, res: Response) {
     }
 
     res.status(201).json(notebookRecord);
+}
+
+export function verifyNotebook(notebookRequest: unknown) {
+    if (!isNotebook(notebookRequest)) {
+        throw new BadRequestError("Payload is invalid type");
+    }
+
+    if (notebookRequest.notebookName.length > NotebookNameCharLimit) {
+        throw new BadRequestError(`Notebook name exceeds character limit of ${NotebookNameCharLimit}`);
+    }
+
+    return notebookRequest;
+}
+
+export function isNotebook(obj: unknown): obj is NotebookRequest {
+    if (!(obj as NotebookRequest).notebookName || typeof (obj as NotebookRequest).notebookName !== "string") {
+        return false
+    }
+
+    return true;
 }
