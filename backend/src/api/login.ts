@@ -6,7 +6,7 @@ import { db } from "../db/index.js";
 import { BadRequestError, NotFoundError } from "./errors.js";
 import { type SafeUserRecord } from "./create-user.js";
 import { setupRefreshToken } from "./auth/refresh.js";
-import { createRefreshToken } from "../db/queries/refresh-tokens.js";
+import { createRefreshToken, revokeAllRefreshTokens } from "../db/queries/refresh-tokens.js";
 import { createJWT } from "./auth/jwt.js";
 import { config } from "../config.js";
 import { OneHourS, SixtyDaysMs } from "./api-constants.js";
@@ -33,6 +33,8 @@ export async function handlerLogin(req: Request, res: Response): Promise<void> {
     const hash = userRecord.hashedPassword;
     await verifyHash(hash, userLogin.password);
 
+    await revokeAllRefreshTokens(db, userRecord.id);
+    
     const refreshTokenQuery = setupRefreshToken(userRecord.id, SixtyDaysMs);
     const refreshTokenRecord = await createRefreshToken(db, refreshTokenQuery);
 

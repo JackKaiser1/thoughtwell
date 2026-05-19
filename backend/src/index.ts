@@ -16,7 +16,8 @@ import { handlerGetPagesOfNotebook } from "./api/get-pages-from-notebook.js";
 import { handlerAddNotebooksToNotebook } from "./api/add-notebooks-notebooks.js";
 import { handlerGetChildren } from "./api/get-notebooks-from-notebook.js";
 import { handlerRefresh } from "./api/refresh-access.js";
-import { authMiddleware } from "./api/middleware/auth-middleware.js";
+import { authMiddleware, apiKeyAuthMiddleware } from "./api/middleware/auth-middleware.js";
+import { handlerRevoke } from "./api/revoke.js";
 
 export const app = express();
 const PORT = 8080;
@@ -32,6 +33,10 @@ app.get("/api/readiness", async (req, res, next) => {
 // tokens
 app.post("/api/refresh", async (req, res, next) => {
     Promise.resolve(await handlerRefresh(req, res)).catch(next);
+});
+
+app.post("/api/revoke", async (req, res, next) => {
+    Promise.resolve(await handlerRevoke(req, res)).catch(next);
 });
 
 // pages
@@ -70,7 +75,7 @@ app.get("/api/users/:userId", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetUser(req, res)).catch(next);
 });
 
-app.get("/api/users", async (req, res, next) => {
+app.get("/api/users", apiKeyAuthMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetUsers(req, res)).catch(next);
 });
 
@@ -78,7 +83,7 @@ app.delete("/api/users/:userId", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerDeleteUser(req, res)).catch(next);
 });
 
-app.delete("/api/users", async (req, res, next) => {
+app.delete("/api/users", apiKeyAuthMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerDeleteUsers(req, res)).catch(next);
 });
  
@@ -94,7 +99,7 @@ app.get("/api/notebooks", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetTopLevelNotebooks(req, res)).catch(next);
 });
 
-app.get("/api/notebooks/all", async (req, res, next) => {
+app.get("/api/notebooks/all", apiKeyAuthMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetNotebooks(req, res)).catch(next);
 });
 
