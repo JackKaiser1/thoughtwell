@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import ViewPort from './ViewPort.vue';
-import SideBar from './SideBar.vue';
+import ViewPort from './layout/ViewPort.vue';
+import SideBar from './layout/SideBar.vue';
 
 </script>
 
 <template>
     <div class="container">
-        <SideBar />
+        <SideBar /> 
         <ViewPort />
     </div>
 

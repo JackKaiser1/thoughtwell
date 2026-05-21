@@ -18,12 +18,14 @@ import { handlerGetChildren } from "./api/get-notebooks-from-notebook.js";
 import { handlerRefresh } from "./api/refresh-access.js";
 import { authMiddleware, apiKeyAuthMiddleware } from "./api/middleware/auth-middleware.js";
 import { handlerRevoke } from "./api/revoke.js";
+import cors from "cors";
 
 export const app = express();
 const PORT = 8080;
  
 app.use(loggingMiddleware);
 app.use(express.json());
+app.use(cors());
 
 app.get("/api/readiness", async (req, res, next) => {
     Promise.resolve(await handlerReadiness(req, res)).catch(next);
