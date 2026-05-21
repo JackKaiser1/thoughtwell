@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import LayoutContainer from './layout/LayoutContainer.vue';
+  import LayoutContainer from './LayoutContainer.vue';
 </script>
 
 <template>

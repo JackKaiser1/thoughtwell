@@ -14,6 +14,6 @@
         display: flex;
         background-color: rgb(54, 54, 54);
         height: 100dvh;
-        width: 90dvw;
+        width: 93dvw;
     }
 </style>
