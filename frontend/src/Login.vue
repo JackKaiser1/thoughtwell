@@ -10,16 +10,17 @@
         const name = userName.value;
         const pass = password.value;
 
-        const reqBody = JSON.stringify({
-            userName: name,
-            password: pass,
-        });
-
         try {
             const response = await fetch(url, {
                 method: "POST",
                 mode: "cors",
-                body: reqBody,
+                body: JSON.stringify({
+                    userName: name,
+                    password: pass,
+                }),
+                headers: {
+                    "Content-type": "application/json",
+                }
             });
 
             if (!response.ok) {
@@ -46,13 +47,13 @@
     <div class="container"> 
         <h1>ThoughtWell</h1>
         <form>
-            <label>Username</label>
+            <label for="username" >Username</label>
             <br>
-            <input v-model="userName">
+            <input v-model="userName" type="text" name="username" id="username">
             <br>
-            <label>Password</label>
+            <label for="password">Password</label>
             <br>
-            <input v-model="password">
+            <input v-model="password" type="text" name="password" id="password">
             <br>
     
             <input type="button" id="loginButton" name="loginButton" value="Login" @click="loginUser"></input>
