@@ -1,5 +1,6 @@
 <script setup lang="ts">
     import { ref } from 'vue';
+    import { type UserResponse } from "../src/types/response.js";
 
     const userName = ref("");
     const password = ref("");
@@ -27,9 +28,11 @@
                 throw new Error(`${response.status}`);
             }
 
-            const result = await response.json();
-            console.log(result);
-            return result;
+            const userRecord: UserResponse = await response.json();
+
+            sessionStorage.setItem("userId", userRecord.id);
+            sessionStorage.setItem("accessToken", userRecord.accessToken);
+            sessionStorage.setItem("refreshToken", userRecord.refreshToken);
 
         } catch (err) {
             if (err instanceof Error) {
