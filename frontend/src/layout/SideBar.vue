@@ -1,10 +1,18 @@
 <script setup lang="ts">
     import HomeButton from './sidebar/HomeButton.vue';
+    import LoosePagesButton from './sidebar/LoosePagesButton.vue';
+    import ReadModeButton from './sidebar/ReadModeButton.vue';
+    import WriteModeButton from './sidebar/WriteModeButton.vue';
+
 </script>
 
 <template>
     <div class="sideBarBackground">
         <HomeButton />
+        <hr>
+        <LoosePagesButton />
+        <WriteModeButton />
+        <ReadModeButton />
         <hr>
     </div>
 </template>
