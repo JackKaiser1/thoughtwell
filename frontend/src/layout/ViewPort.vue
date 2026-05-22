@@ -1,12 +1,15 @@
 <script setup lang="ts">
     import Page from './viewport/Page.vue';
+    import { useLoosePageStore } from '../stores/loose-pages';
 
-    const arr = ["1", "2", "3", "4","1", "2", "3", "4","1", "2", "3", "4","1", "2", "3", "4",]; 
+
 </script>
 
 <template>
     <div class="viewPortbackground"> 
-        <Page v-for="num in arr" :page-content="num"/> 
+        <Page v-for="page in useLoosePageStore().loosePages" 
+            :page-content="page.pageContent"
+            :page-id="page.id"/> 
         
     </div>
 </template>

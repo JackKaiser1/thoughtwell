@@ -1,12 +1,15 @@
 <script setup lang="ts">
-    import { useSessionStore } from '../../stores/session.js';
+    import { useLoosePageStore } from '@/stores/loose-pages.js';
+import { useSessionStore } from '../../stores/session.js';
 
     const username: string = sessionStorage.userName;
 
     function logoutUser() {
         useSessionStore().logoutSession();
+        useLoosePageStore().clearLoosePages();
         console.log(sessionStorage);
     }
+
 </script>
 
 <template>

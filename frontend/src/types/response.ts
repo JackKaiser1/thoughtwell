@@ -17,3 +17,12 @@ export type CreateUserResponse = {
 export type ErrorResponse = {
     error: string;
 }
+
+export type PageResponse = {
+    id: string;
+    pageContent: string;
+    isChild: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    userId: string;
+}
