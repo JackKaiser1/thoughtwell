@@ -39,8 +39,10 @@
             sessionStorage.setItem("userId", userRecord.id);
             sessionStorage.setItem("accessToken", userRecord.accessToken);
             sessionStorage.setItem("refreshToken", userRecord.refreshToken);
+            sessionStorage.setItem("userName", userRecord.userName);
 
             useSessionStore().loginSession();
+            console.log(sessionStorage);
 
         } catch (err) {
             printError(err);

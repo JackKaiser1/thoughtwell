@@ -9,6 +9,7 @@ export const useSessionStore = defineStore("session", () => {
   }
 
   function logoutSession() {
+    sessionStorage.clear();
     isLoggedIn.value = false;
   }
 
