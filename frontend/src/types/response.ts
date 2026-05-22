@@ -6,3 +6,7 @@ export type UserResponse = {
     accessToken: string,
     refreshToken: string,
 }
+
+export type ErrorResponse = {
+    error: string;
+}

@@ -1,23 +1,22 @@
 <script setup lang="ts">
     import { ref } from 'vue';
     import { type UserResponse } from "../src/types/response.js";
+    import { serverURL } from "./constants.js";
+    import { apiErrorHandler, printError } from './lib/errorHandler.js';
 
     const userName = ref("");
     const password = ref("");
 
     async function loginUser() {
-        const url = "http://localhost:8080/api/login";
-
-        const name = userName.value;
-        const pass = password.value;
+        const url = `${serverURL}/api/login`;
 
         try {
             const response = await fetch(url, {
                 method: "POST",
                 mode: "cors",
                 body: JSON.stringify({
-                    userName: name,
-                    password: pass,
+                    userName: userName.value,
+                    password: password.value,
                 }),
                 headers: {
                     "Content-type": "application/json",
@@ -25,7 +24,8 @@
             });
 
             if (!response.ok) {
-                throw new Error(`${response.status}`);
+                await apiErrorHandler(response);
+                throw new Error;
             }
 
             const userRecord: UserResponse = await response.json();
@@ -35,12 +35,7 @@
             sessionStorage.setItem("refreshToken", userRecord.refreshToken);
 
         } catch (err) {
-            if (err instanceof Error) {
-                console.log(err.message);
-            }
-            else {
-                console.log(`${err}`);
-            }
+            printError(err);
         }
     }
 </script>
@@ -60,6 +55,7 @@
             <br>
     
             <input type="button" id="loginButton" name="loginButton" value="Login" @click="loginUser"></input>
+            <alert></alert>
 
             <input type="button" id="createUserButton" name="createUserButton" value="Register">
         </form>
