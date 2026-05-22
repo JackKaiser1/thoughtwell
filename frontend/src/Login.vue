@@ -1,53 +1,73 @@
 <script setup lang="ts">
     import { ref } from 'vue';
-    import { type UserResponse } from "../src/types/response.js";
+    import { type LoginUserResponse, type CreateUserResponse } from "../src/types/response.js";
+    import { serverURL } from "./constants.js";
+    import { apiErrorHandler, printError } from './lib/errorHandler.js';
+    import { useSessionStore } from './stores/session.js';
 
     const userName = ref("");
     const password = ref("");
 
-    async function loginUser() {
-        const url = "http://localhost:8080/api/login";
+    async function sendUserData(url: string) {
+        const response = await fetch(url, {
+            method: "POST",
+            mode: "cors",
+            body: JSON.stringify({
+                userName: userName.value,
+                password: password.value,
+            }),
+            headers: {
+                "Content-type": "application/json",
+            }
+        });
 
-        const name = userName.value;
-        const pass = password.value;
+        if (!response.ok) {
+            await apiErrorHandler(response);
+            throw new Error;
+        }
+
+        return response;
+    }
+
+    async function loginUser() {
+        const url = `${serverURL}/api/login`;
 
         try {
-            const response = await fetch(url, {
-                method: "POST",
-                mode: "cors",
-                body: JSON.stringify({
-                    userName: name,
-                    password: pass,
-                }),
-                headers: {
-                    "Content-type": "application/json",
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`${response.status}`);
-            }
-
-            const userRecord: UserResponse = await response.json();
+            const response = await sendUserData(url);
+            const userRecord: LoginUserResponse = await response.json();
 
             sessionStorage.setItem("userId", userRecord.id);
             sessionStorage.setItem("accessToken", userRecord.accessToken);
             sessionStorage.setItem("refreshToken", userRecord.refreshToken);
+            sessionStorage.setItem("userName", userRecord.userName);
+
+            useSessionStore().loginSession();
+            console.log(sessionStorage);
 
         } catch (err) {
-            if (err instanceof Error) {
-                console.log(err.message);
-            }
-            else {
-                console.log(`${err}`);
-            }
+            printError(err);
+        }
+    }
+
+    async function createUser() {
+        const url = `${serverURL}/api/users`;
+
+        try {
+            const response = await sendUserData(url);
+            const userRecord: CreateUserResponse = await response.json();
+
+            console.log(userRecord);
+            alert("User successfully created! Login to gain access");
+
+        } catch (err) {
+            printError(err);
         }
     }
 </script>
 
 <template>
     
-    <div class="container"> 
+    <div class="containerLogin"> 
         <h1>ThoughtWell</h1>
         <form>
             <label for="username" >Username</label>
@@ -61,7 +81,7 @@
     
             <input type="button" id="loginButton" name="loginButton" value="Login" @click="loginUser"></input>
 
-            <input type="button" id="createUserButton" name="createUserButton" value="Register">
+            <input type="button" id="createUserButton" name="createUserButton" value="Register" @click="createUser">
         </form>
     </div>
 </template>
@@ -84,7 +104,7 @@
         background-color: transparent;
         font-size: clamp(1.5rem, 1.5rem + 2vw, 4rem);
     }
-    .container {
+    .containerLogin {
         background-color: rgb(54, 54, 54);
         display: flex;
         justify-content: center;

@@ -5,7 +5,7 @@ import SideBar from './layout/SideBar.vue';
 </script>
 
 <template>
-    <div class="container">
+    <div class="containerLayout">
         <SideBar /> 
         <ViewPort />
     </div>
@@ -13,7 +13,7 @@ import SideBar from './layout/SideBar.vue';
 </template>
 
 <style>
-    .container {
+    .containerLayout {
         background-color: aquamarine;
         display: flex;
         justify-content: left;
