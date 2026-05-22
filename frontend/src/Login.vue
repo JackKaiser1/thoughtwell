@@ -3,6 +3,7 @@
     import { type LoginUserResponse, type CreateUserResponse } from "../src/types/response.js";
     import { serverURL } from "./constants.js";
     import { apiErrorHandler, printError } from './lib/errorHandler.js';
+    import { useSessionStore } from './stores/session.js';
 
     const userName = ref("");
     const password = ref("");
@@ -39,6 +40,8 @@
             sessionStorage.setItem("accessToken", userRecord.accessToken);
             sessionStorage.setItem("refreshToken", userRecord.refreshToken);
 
+            useSessionStore().loginSession();
+
         } catch (err) {
             printError(err);
         }
@@ -62,7 +65,7 @@
 
 <template>
     
-    <div class="container"> 
+    <div class="containerLogin"> 
         <h1>ThoughtWell</h1>
         <form>
             <label for="username" >Username</label>
@@ -99,7 +102,7 @@
         background-color: transparent;
         font-size: clamp(1.5rem, 1.5rem + 2vw, 4rem);
     }
-    .container {
+    .containerLogin {
         background-color: rgb(54, 54, 54);
         display: flex;
         justify-content: center;
