@@ -4,7 +4,7 @@
     import Page from './Page.vue';
     import { useCurrentNotebookStore } from '@/stores/current-notebook';
 
-    
+     
 </script>
 
 <template>
@@ -12,10 +12,12 @@
 
     <Notebook v-for="notebook in useCurrentNotebookStore().currentNotebookContent.notebooks" 
                     :notebook-name="notebook.notebookName"
-                    :notebook-id="notebook.id"/>
+                    :notebook-id="notebook.id"
+                    :key="notebook.id"/>
     <Page v-for="page in useCurrentNotebookStore().currentNotebookContent.pages" 
                 :page-content="page.pageContent"
-                :page-id="page.id"/>
+                :page-id="page.id"
+                :key="page.id"/>
 </template>
 
 <style></style>

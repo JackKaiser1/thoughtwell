@@ -47,8 +47,8 @@
 </script>
 
 <template>
-    <RouterLink @click="fetchNotebookContent" to="/notebooks/content">
-        <div class="notebook">
+    <RouterLink to="/notebooks/content">
+        <div @click="fetchNotebookContent" class="notebook">
             <p>{{ name }}</p>
         </div>
     </RouterLink>
