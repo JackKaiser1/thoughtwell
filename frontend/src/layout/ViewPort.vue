@@ -1,15 +1,20 @@
 <script setup lang="ts">
     import Page from './viewport/Page.vue';
     import { useLoosePageStore } from '../stores/loose-pages';
+    import LoosePagesMode from './viewport/LoosePagesMode.vue';
+    import Home from './viewport/Home.vue';
+    import { useRoute } from 'vue-router';
 
+    const route = useRoute();
+    const homeRoute = "/home";
+    const loosePagesRoute = "/loosePages";
 
 </script>
 
 <template>
     <div class="viewPortbackground"> 
-        <Page v-for="page in useLoosePageStore().loosePages" 
-            :page-content="page.pageContent"
-            :page-id="page.id"/> 
+        <Home v-if="route.fullPath === homeRoute"/>
+        <LoosePagesMode v-else-if="route.fullPath === loosePagesRoute"/>
         
     </div>
 </template>

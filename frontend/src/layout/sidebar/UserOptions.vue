@@ -1,12 +1,14 @@
 <script setup lang="ts">
     import { useLoosePageStore } from '@/stores/loose-pages.js';
-import { useSessionStore } from '../../stores/session.js';
+    import { useSessionStore } from '../../stores/session.js';
+    import { useTopLevelNotebooksStore } from '@/stores/top-level-notebooks.js';
 
     const username: string = sessionStorage.userName;
 
     function logoutUser() {
         useSessionStore().logoutSession();
         useLoosePageStore().clearLoosePages();
+        useTopLevelNotebooksStore().clearTopLevelNotebooks();
         console.log(sessionStorage);
     }
 
