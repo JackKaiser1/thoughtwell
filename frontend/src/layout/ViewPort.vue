@@ -4,10 +4,12 @@
     import LoosePagesMode from './viewport/LoosePagesMode.vue';
     import Home from './viewport/Home.vue';
     import { useRoute } from 'vue-router';
+    import NotebookContent from './viewport/NotebookContent.vue';
 
     const route = useRoute();
     const homeRoute = "/home";
     const loosePagesRoute = "/loosePages";
+    const notebookContent = "/notebooks/content"
 
 </script>
 
@@ -15,7 +17,7 @@
     <div class="viewPortbackground"> 
         <Home v-if="route.fullPath === homeRoute"/>
         <LoosePagesMode v-else-if="route.fullPath === loosePagesRoute"/>
-        
+        <NotebookContent v-else-if="route.fullPath === notebookContent"/>
     </div>
 </template>
 

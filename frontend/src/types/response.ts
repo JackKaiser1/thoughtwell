@@ -35,3 +35,8 @@ export type NotebookResponse = {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export type NotebookContentResponse = {
+    pages: PageResponse[],
+    notebooks: NotebookResponse[],
+}
