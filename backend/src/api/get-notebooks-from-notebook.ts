@@ -21,7 +21,14 @@ export async function handlerGetChildren(req: Request, res: Response) {
     const children = await getChildren(db, notebookId);
     if (children.pageChildren.length < 1 &&
         children.notebookChildren.length < 1) {
-        throw new NotFoundError("Children not found for given notebook");
+        
+        const fetchedChildren = {
+            pages: [],
+            notebooks: [],
+        }
+
+        res.status(200).json(fetchedChildren);
+        return;
     }
 
 
