@@ -1,33 +1,52 @@
 import type { NotebookContentResponse } from "@/types/response";
 import { defineStore } from "pinia";
 import { type Ref, ref } from "vue";
+import { fetchNotebookContent } from "@/lib/fetchContent";
 
-export type CurrentNotebookObj = {
+export type VisitedNotebook = {
     notebookId?: string, 
     notebookName?: string
 }
 
 export const useCurrentNotebookStore = defineStore("currentNotebook", () => {
-    const currentNotebookArray: Ref<CurrentNotebookObj[]> = ref([]);
+    const visitedNotebooksArray: Ref<VisitedNotebook[]> = ref([]);
 
-    const currentNotebook: Ref<CurrentNotebookObj | undefined> = ref(currentNotebookArray.value[-1]);
+    const currentNotebook: Ref<VisitedNotebook | undefined> = ref(visitedNotebooksArray.value[-1]);
 
     const currentNotebookContent: Ref<NotebookContentResponse> = ref({ pages: [], notebooks: [] });
 
-    function setCurrentNotebook(notebook: CurrentNotebookObj) {
-        currentNotebookArray.value.push(notebook);
-        currentNotebook.value = currentNotebookArray.value[-1];
+    function setCurrentNotebook(notebook: VisitedNotebook) {
+        currentNotebook.value = notebook;
     }
 
-    function openNotebook(content: NotebookContentResponse, notebook: CurrentNotebookObj) {
+    function openNotebook(content: NotebookContentResponse, notebook: VisitedNotebook) {
         currentNotebookContent.value = { pages: [], notebooks: [] };
 
-        setCurrentNotebook(notebook)
+        vistNotebook(notebook);
+        setCurrentNotebook(notebook);
+        currentNotebookContent.value = content;
+    }
+
+    function vistNotebook(notebook: VisitedNotebook) {
+        visitedNotebooksArray.value.push(notebook);
+    }
+
+    function revisitNotebook(content: NotebookContentResponse, notebook: VisitedNotebook) {
+        const visited = visitedNotebooksArray.value;
+        let notebookIndex = 0;
+        for (let i = 0; i < visited.length; i++) {
+            if (visited[i] === notebook) {
+                notebookIndex = i;
+            }
+        }
+
+        visitedNotebooksArray.value = visitedNotebooksArray.value.slice(0, notebookIndex + 1);
+        setCurrentNotebook(notebook);
         currentNotebookContent.value = content;
     }
 
     function clearCurrentNotebook() {
-        currentNotebookArray.value = [];
+        visitedNotebooksArray.value = [];
         currentNotebook.value = undefined;
     }
 
@@ -35,10 +54,11 @@ export const useCurrentNotebookStore = defineStore("currentNotebook", () => {
 
     return { 
         currentNotebook, 
-        currentNotebookArray, 
+        visitedNotebooksArray, 
         currentNotebookContent, 
         setCurrentNotebook, 
         clearCurrentNotebook,
         openNotebook,
+        revisitNotebook,
     };
 });

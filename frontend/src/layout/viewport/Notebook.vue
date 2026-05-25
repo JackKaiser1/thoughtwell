@@ -1,10 +1,6 @@
 <script setup lang="ts">
-    import { ref } from "vue";
-    import { serverURL } from "@/constants";
-    import { apiErrorHandler, printError } from "@/lib/errorHandler";
-    import { type NotebookContentResponse } from "@/types/response";
-    import { useCurrentNotebookStore } from "@/stores/current-notebook";
-    import { nextTick } from "vue";
+    import { fetchNotebookContent } from "@/lib/fetchContent.js";
+    import { type VisitedNotebook } from "@/stores/current-notebook.js"
 
     const props = defineProps({
         notebookId: String,
@@ -14,41 +10,12 @@
     const name = props.notebookName;
     const notebookId = props.notebookId;
 
-    async function fetchNotebookContent() {
-        const url = `${serverURL}/api/notebooks/${notebookId}/children`;
-
-        try {
-            const response = await fetch(url, {
-                method: "GET",
-                mode: "cors",
-                headers: {
-                    "Authorization": `Bearer ${sessionStorage.accessToken}`
-                }
-            });
-
-            if (!response.ok) {
-                apiErrorHandler(response);
-                throw new Error;
-            }
-
-            const result: NotebookContentResponse = await response.json();
-
-            const currentNotebook = {notebookId: notebookId, notebookName: name};
-            useCurrentNotebookStore().openNotebook(result, currentNotebook);
-            console.log(useCurrentNotebookStore().currentNotebookContent);
-            console.log(useCurrentNotebookStore().currentNotebookArray);
-
-            
-
-        } catch (err) {
-            printError(err);
-        }
-    }
+    const notebook: VisitedNotebook = { notebookId: notebookId, notebookName: name };
 </script>
 
 <template>
     <RouterLink to="/notebooks/content">
-        <div @click="fetchNotebookContent" class="notebook">
+        <div @click="fetchNotebookContent(notebook)" class="notebook">
             <p>{{ name }}</p>
         </div>
     </RouterLink>
