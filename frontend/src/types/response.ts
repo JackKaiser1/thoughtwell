@@ -26,3 +26,17 @@ export type PageResponse = {
     updatedAt: Date;
     userId: string;
 }
+
+export type NotebookResponse = {
+    userId: string;
+    id: string;
+    notebookName: string;
+    isChild: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export type NotebookContentResponse = {
+    pages: PageResponse[],
+    notebooks: NotebookResponse[],
+}

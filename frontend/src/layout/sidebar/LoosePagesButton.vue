@@ -34,7 +34,10 @@
 </script>
 
 <template>
-    <img @click="fetchLoosePages" class="loosePagesButton" src="../../assets/sidebar/loose pages graphic.png">
+    <RouterLink to="/loosePages">
+        <img @click="fetchLoosePages" class="loosePagesButton" src="../../assets/sidebar/loose pages graphic.png">
+    </RouterLink>
+
 </template>
 
 <style>
