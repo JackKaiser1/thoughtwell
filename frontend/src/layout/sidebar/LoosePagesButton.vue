@@ -1,6 +1,6 @@
 <script setup lang="ts">
     import { apiErrorHandler, printError } from '../../lib/errorHandler.js';
-    import { serverURL } from '../../constants.js';
+    import { loosePagesRoute, serverURL } from '../../constants.js';
     import { type PageResponse } from "../../types/response.js";
     import { useLoosePageStore } from '@/stores/loose-pages.js';
 
@@ -34,7 +34,7 @@
 </script>
 
 <template>
-    <RouterLink to="/loosePages">
+    <RouterLink :to="loosePagesRoute">
         <img @click="fetchLoosePages" class="loosePagesButton" src="../../assets/sidebar/loose pages graphic.png">
     </RouterLink>
 
