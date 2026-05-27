@@ -6,21 +6,32 @@
     import { useRoute } from 'vue-router';
     import NotebookContent from './viewport/NotebookContent.vue';
     import BreadCrumbs from './viewport/BreadCrumbs.vue';
+    import ContextMenu from './viewport/ContextMenu.vue';
+    import { onMounted, useTemplateRef, ref } from 'vue';
 
     const route = useRoute();
     const homeRoute = "/home";
     const loosePagesRoute = "/loosePages";
     const notebookContent = "/notebooks/content"
 
+    const menu = useTemplateRef("contextMenu");
+
+    
+    onMounted(() => {
+        console.log("done");
+    });
 </script>
 
 <template>
-    <div class="viewPortbackground"> 
+    <div class="viewPortbackground" @contextmenu.prevent="menu?.showMenu($event)" @click="menu?.closeMenu()"> 
+
+        <ContextMenu ref="contextMenu" v-show="menu?.isShone"/>
         <div class="breadCrumbsContainer">
             <BreadCrumbs />
         </div>
+        
 
-        <div class="contentContainer">
+        <div class="contentContainer" >
             <Home v-if="route.fullPath === homeRoute"/>
             <LoosePagesMode v-else-if="route.fullPath === loosePagesRoute"/>
             <NotebookContent v-else-if="route.fullPath === notebookContent"/>
