@@ -1,9 +1,12 @@
 <script setup lang="ts">
-    import { ref } from 'vue';
+    import { ref, useTemplateRef } from 'vue';
+    import AddNotebookButton from './context-menu/AddNotebookButton.vue';
 
     const menuX = ref(0);
     const menuY = ref(0);
     const isShone = ref(false);
+
+    const newNotebook = useTemplateRef("newNotebook")
 
     function showMenu(event: MouseEvent) {
         isShone.value = true;
@@ -13,6 +16,7 @@
 
     function closeMenu() {
         isShone.value = false;
+        newNotebook.value?.unClicked();
     }
 
     defineExpose({
@@ -20,19 +24,21 @@
         closeMenu,
         isShone,
     });
+
+    
 </script>
 
 <template>
     <div class="contextMenu" :style="{ top: menuY + 'px', left: menuX + 'px' }">
-        <button class="contextButton">Add notebook</button>
+        <AddNotebookButton ref="newNotebook"/>
     </div>
 </template>
 
 <style>
     .contextMenu {
         background-color: rgb(22, 22, 22);
-        height: 10rem;
-        width: 8rem;
+        height: auto;
+        width: 10rem;
         border-radius: 3px;
         position: fixed;
         display: flex;
@@ -43,15 +49,6 @@
         z-index: 10;
     }
 
-    .contextButton {
-        border: none;
-        background-color: rgb(26, 26, 26);
-        color: white;
-        margin: 0.2rem;
-    }
-
-    .contextButton:hover {
-        background-color: rgb(47, 47, 47);
-    }
+    
 
 </style>

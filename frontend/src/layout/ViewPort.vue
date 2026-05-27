@@ -23,9 +23,11 @@
 </script>
 
 <template>
-    <div class="viewPortbackground" @contextmenu.prevent="menu?.showMenu($event)" @click="menu?.closeMenu()"> 
+    <div class="viewPortbackground" @contextmenu.prevent="menu?.showMenu($event)" @auxclick="menu?.closeMenu()"> 
 
-        <ContextMenu ref="contextMenu" v-show="menu?.isShone"/>
+        <ContextMenu ref="contextMenu" 
+            v-show="menu?.isShone"/>
+
         <div class="breadCrumbsContainer">
             <BreadCrumbs />
         </div>
