@@ -1,12 +1,15 @@
 <script setup lang="ts">
     import { useCurrentNotebookStore } from '@/stores/current-notebook';
     import { fetchNotebookContent } from '@/lib/fetchContent';
+    import { notebookContentRoute } from '@/constants';
 </script>
 
 <template>
-    <button v-for="notebook in useCurrentNotebookStore().visitedNotebooksArray"
-        @click="fetchNotebookContent(notebook)"
-        class="breadCrumbs"> {{ notebook.notebookName }} / </button>
+    <RouterLink :to="notebookContentRoute">
+        <button v-for="notebook in useCurrentNotebookStore().visitedNotebooksArray"
+            @click="fetchNotebookContent(notebook)"
+            class="breadCrumbs"> {{ notebook.notebookName }} / </button>
+    </RouterLink>
 
 </template>
 

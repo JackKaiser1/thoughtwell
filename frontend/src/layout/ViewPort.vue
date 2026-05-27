@@ -8,14 +8,11 @@
     import BreadCrumbs from './viewport/BreadCrumbs.vue';
     import ContextMenu from './viewport/ContextMenu.vue';
     import { onMounted, useTemplateRef, ref } from 'vue';
-import WriteMode from './viewport/WriteMode.vue';
+    import WriteMode from './viewport/WriteMode.vue';
+    import { homeRoute, loosePagesRoute, notebookContentRoute, writeModeRoute } from "@/constants";
 
     const route = useRoute();
-    const homeRoute = "/home";
-    const loosePagesRoute = "/loosePages";
-    const notebookContent = "/notebooks/content";
-    const writeMode = "/pages/write";
-
+    
     const menu = useTemplateRef("contextMenu");
 
     
@@ -38,11 +35,11 @@ import WriteMode from './viewport/WriteMode.vue';
         <div class="contentContainer" >
             <Home v-if="route.fullPath === homeRoute"/>
             <LoosePagesMode v-else-if="route.fullPath === loosePagesRoute"/>
-            <NotebookContent v-else-if="route.fullPath === notebookContent"/>
+            <NotebookContent v-else-if="route.fullPath === notebookContentRoute"/>
         </div>   
 
         <div class="writeModeContainer">
-            <WriteMode v-if="route.fullPath === writeMode"/>
+            <WriteMode v-if="route.fullPath === writeModeRoute"/>
         </div>
     </div>
 </template>

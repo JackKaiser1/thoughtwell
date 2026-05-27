@@ -7,7 +7,7 @@ import WriteMode from '@/layout/viewport/WriteMode.vue';
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { path: "/loosePages", component: LoosePageMode },
+    { path: "/pages/loose", component: LoosePageMode },
     { path: "/home", component: Home },
     { path: "/notebooks/content", component: NotebookContent},
     { path: "/pages/write", component: WriteMode },

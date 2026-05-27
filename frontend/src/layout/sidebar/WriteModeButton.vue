@@ -1,7 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { writeModeRoute } from '@/constants';
+
+</script>
 
 <template>
-    <RouterLink to="/pages/write">
+    <RouterLink :to="writeModeRoute">
         <img class="writeModeButton" src="../../assets/sidebar/new page graphic.png">
     </RouterLink>
 </template>
