@@ -1,13 +1,13 @@
 <script setup lang="ts"></script>
 
 <template>
-    <div>
-        <img class="homeButton" src="../../assets/sidebar/new page graphic.png">
-    </div>
+    <RouterLink to="/pages/write">
+        <img class="writeModeButton" src="../../assets/sidebar/new page graphic.png">
+    </RouterLink>
 </template>
 
 <style>
-    .homeButton {
+    .writeModeButton {
         height: auto;
         width: 100%;
         padding: 1rem;

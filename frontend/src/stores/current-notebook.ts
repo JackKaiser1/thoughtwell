@@ -50,6 +50,12 @@ export const useCurrentNotebookStore = defineStore("currentNotebook", () => {
         currentNotebook.value = undefined;
     }
 
+    async function refreshContent() {
+        if (currentNotebook.value !== undefined) {
+            await fetchNotebookContent(currentNotebook.value);
+        }
+    }
+
 
 
     return { 
@@ -60,5 +66,6 @@ export const useCurrentNotebookStore = defineStore("currentNotebook", () => {
         clearCurrentNotebook,
         openNotebook,
         revisitNotebook,
+        refreshContent,
     };
 });

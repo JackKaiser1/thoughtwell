@@ -2,6 +2,7 @@ import { BadRequestError } from "../api/errors.js";
 
 export type PageObj = {
     pageContent: string;
+    parentNotebookId?: string;
 }
 
 export function verifyPageData(page: unknown, limit: number) {

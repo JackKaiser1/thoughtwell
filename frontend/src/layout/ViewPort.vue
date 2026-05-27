@@ -8,11 +8,13 @@
     import BreadCrumbs from './viewport/BreadCrumbs.vue';
     import ContextMenu from './viewport/ContextMenu.vue';
     import { onMounted, useTemplateRef, ref } from 'vue';
+import WriteMode from './viewport/WriteMode.vue';
 
     const route = useRoute();
     const homeRoute = "/home";
     const loosePagesRoute = "/loosePages";
-    const notebookContent = "/notebooks/content"
+    const notebookContent = "/notebooks/content";
+    const writeMode = "/pages/write";
 
     const menu = useTemplateRef("contextMenu");
 
@@ -38,6 +40,10 @@
             <LoosePagesMode v-else-if="route.fullPath === loosePagesRoute"/>
             <NotebookContent v-else-if="route.fullPath === notebookContent"/>
         </div>   
+
+        <div class="writeModeContainer">
+            <WriteMode v-if="route.fullPath === writeMode"/>
+        </div>
     </div>
 </template>
 
@@ -60,6 +66,13 @@
         flex-direction: row;
         flex-wrap: wrap;
         overflow-y: scroll;
+    }
+
+    .writeModeContainer {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .viewPortbackground {
