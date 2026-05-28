@@ -10,6 +10,7 @@
     import { onMounted, useTemplateRef, ref } from 'vue';
     import WriteMode from './viewport/WriteMode.vue';
     import { homeRoute, loosePagesRoute, notebookContentRoute, writeModeRoute } from "@/constants";
+    import { useSelectedPageStore } from '@/stores/selected-pages.ts';
 
     const route = useRoute();
     
@@ -22,7 +23,9 @@
 </script>
 
 <template>
-    <div class="viewPortbackground" @contextmenu.prevent="menu?.showMenu($event)" @auxclick="menu?.closeMenu()"> 
+    <div class="viewPortbackground" 
+        @contextmenu.prevent="menu?.showMenu($event)" 
+        @auxclick="menu?.closeMenu()"> 
 
         <ContextMenu ref="contextMenu" 
             v-show="menu?.isShone"/>
