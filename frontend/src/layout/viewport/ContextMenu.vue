@@ -1,6 +1,7 @@
 <script setup lang="ts">
     import { ref, useTemplateRef } from 'vue';
     import AddNotebookButton from './context-menu/AddNotebookButton.vue';
+    import ClearPageSelection from './context-menu/ClearPageSelectionButton.vue';
 
     const menuX = ref(0);
     const menuY = ref(0);
@@ -31,6 +32,8 @@
 <template>
     <div class="contextMenu" :style="{ top: menuY + 'px', left: menuX + 'px' }">
         <AddNotebookButton ref="newNotebook"/>
+        <br>
+        <ClearPageSelection />
     </div>
 </template>
 
@@ -44,6 +47,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-direction: column;
         top: 0px;
         left: 0px;
         z-index: 10;
