@@ -3,6 +3,7 @@
     import AddNotebookButton from './context-menu/AddNotebookButton.vue';
     import ClearPageSelection from './context-menu/ClearPageSelectionButton.vue';
     import AddPagesToNotebook from './context-menu/AddPagesToNotebook.vue';
+import DeletePageButton from './context-menu/DeletePageButton.vue';
 
     const menuX = ref(0);
     const menuY = ref(0);
@@ -39,6 +40,8 @@
         <ClearPageSelection />
         <br>
         <AddPagesToNotebook ref="addPagestoNotebook"/>
+        <br>
+        <DeletePageButton />
     </div>
 </template>
 
