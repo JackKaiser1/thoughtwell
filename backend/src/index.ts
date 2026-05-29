@@ -19,6 +19,7 @@ import { handlerRefresh } from "./api/refresh-access.js";
 import { authMiddleware, apiKeyAuthMiddleware } from "./api/middleware/auth-middleware.js";
 import { handlerRevoke } from "./api/revoke.js";
 import cors from "cors";
+import { handlerDeleteNotebook } from "./api/delete-notebook.js";
 
 export const app = express();
 const PORT = 8080;
@@ -119,6 +120,10 @@ app.post("/api/notebooks/addNotebooks", authMiddleware, async (req, res, next) =
 
 app.get("/api/notebooks/:notebookId/children", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerGetChildren(req, res)).catch(next);
+});
+
+app.delete("/api/notebooks/:notebookId", authMiddleware, async (req, res, next) => {
+    Promise.resolve(await handlerDeleteNotebook(req, res)).catch(next);
 });
 
 
