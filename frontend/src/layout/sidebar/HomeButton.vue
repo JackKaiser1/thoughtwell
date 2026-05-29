@@ -24,6 +24,7 @@
 
             const result: NotebookResponse[] = await response.json();
 
+            resetCurrentNotebook();
             useTopLevelNotebooksStore().topLevelNotebooks = result;
             useCurrentNotebookStore().currentNotebookContent = { pages: [], notebooks: result };
 
