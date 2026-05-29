@@ -66,52 +66,89 @@
 </script>
 
 <template>
-    
-    <div class="containerLogin"> 
-        <h1>ThoughtWell</h1>
-        <form>
-            <label for="username" >Username</label>
-            <br>
-            <input v-model="userName" type="text" name="username" id="username">
-            <br>
-            <label for="password">Password</label>
-            <br>
-            <input v-model="password" type="text" name="password" id="password">
-            <br>
-    
-            <input type="button" id="loginButton" name="loginButton" value="Login" @click="loginUser"></input>
+    <div class="loginBackground">
+        <div class="containerLogin"> 
+            <h1 class="title">ThoughtWell</h1>
+                <form>
+                    <label for="username" class="loginLabel">Username</label>
+                    <br>
+                    <input v-model="userName" 
+                        type="text" 
+                        name="username" 
+                        id="username"
+                        class="loginInput">
+                    <br>
+                    <label for="password" class="loginLabel">Password</label>
+                    <br>
+                    <input v-model="password" 
+                        type="text" 
+                        name="password" 
+                        id="password"
+                        class="loginInput">
+                    <br>
+            
+            
+                </form>
 
-            <input type="button" id="createUserButton" name="createUserButton" value="Register" @click="createUser">
-        </form>
+                    <input type="button" 
+                        id="loginButton" 
+                        name="loginButton" 
+                        value="Login" 
+                        class="mainMenuButton mainMenuButton-login" 
+                        @click="loginUser"></input>
+                    <br>
+                    <input type="button" 
+                        id="createUserButton" 
+                        name="createUserButton" 
+                        value="Register" 
+                        class="mainMenuButton mainMenuButton-login" 
+                        @click="createUser">
+        </div>
     </div>
 </template>
 
 <style>
 
-    label {
+    .loginLabel {
         color:white;
         font-size: clamp(0.5rem, 0.5rem + 1vw, 4rem);
     }
 
-    input {
+    .loginInput {
         color:rgb(0, 0, 0);
         font-size: clamp(0.5rem, 0.5rem + 1vw, 4rem);
-
+        margin-bottom: 1rem;
     }
 
-    h1 {
+    .title {
+        font-family:'Times New Roman', Times, serif;
         color: white;
-        background-color: transparent;
         font-size: clamp(1.5rem, 1.5rem + 2vw, 4rem);
     }
+
     .containerLogin {
-        background-color: rgb(54, 54, 54);
+        background-color: rgb(44, 44, 44);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        width: 40dvw;
+        height: 80dvh;
+        border-radius: 5px;
+        box-shadow: 2px 2px 10px 1px rgb(29, 29, 29);
+    }
+
+    .loginBackground {
         display: flex;
         justify-content: center;
         align-items: center;
         flex-direction: column;
         width: 100dvw;
         height: 100dvh;
+    }
+
+    .mainMenuButton-login {
+        width: 10dvw;
     }
 
 </style>
