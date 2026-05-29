@@ -8,7 +8,8 @@
 <template>
     <Notebook v-for="notebook in useTopLevelNotebooksStore().topLevelNotebooks" 
                     :notebook-name="notebook.notebookName"
-                    :notebook-id="notebook.id" />
+                    :notebook-id="notebook.id" 
+                    :key="notebook.id"/>
 </template>
 
 <style></style>
