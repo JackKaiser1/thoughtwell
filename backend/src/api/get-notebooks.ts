@@ -32,9 +32,6 @@ export async function handlerGetTopLevelNotebooks(req: Request, res: Response) {
     const userId = verifyUUID(res.locals.userId);
 
     const topLevelNotebooks = await getTopLevelNotebooks(db, userId);
-    if (topLevelNotebooks.length < 1) {
-        throw new NotFoundError("Notebooks not found");
-    }
 
     printProperties(topLevelNotebooks, "notebookName");
 

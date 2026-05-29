@@ -48,6 +48,7 @@ export const useCurrentNotebookStore = defineStore("currentNotebook", () => {
     function clearCurrentNotebook() {
         visitedNotebooksArray.value = [];
         currentNotebook.value = undefined;
+        currentNotebookContent.value = { pages: [], notebooks: [] };
     }
 
     async function refreshContent() {

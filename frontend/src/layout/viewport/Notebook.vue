@@ -1,6 +1,10 @@
 <script setup lang="ts">
+    import { notebookContentRoute } from "@/constants";
     import { fetchNotebookContent } from "@/lib/fetchContent.js";
     import { type VisitedNotebook } from "@/stores/current-notebook.js"
+    import { useSelectedNotebookStore } from "@/stores/selected-notebook";
+    import { computed } from "vue";
+
 
     const props = defineProps({
         notebookId: String,
@@ -11,12 +15,22 @@
     const notebookId = props.notebookId;
 
     const notebook: VisitedNotebook = { notebookId: notebookId, notebookName: name };
+
+    const isNotebookSelected = computed(() => {
+        if (notebookId) {
+            return useSelectedNotebookStore().selectedNotebook === notebookId;
+        }
+    });
+
 </script>
 
 <template>
-    <RouterLink to="/notebooks/content">
-        <div @click="fetchNotebookContent(notebook)" class="notebook">
-            <p>{{ name }}</p>
+    <RouterLink :to="notebookContentRoute">
+        <div @dblclick="fetchNotebookContent(notebook)" 
+             @click="useSelectedNotebookStore().selectNotebook(notebookId as string)"
+             class="notebook"
+             :style="isNotebookSelected ? { borderColor: 'rgb(0, 128, 0)' } : { border: 'none' } ">
+            <p>{{ name }}</p>   
         </div>
     </RouterLink>
 
@@ -34,5 +48,9 @@
         align-items: center;
         padding: 1rem;
         margin: 1rem;
+        border: none;
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent;
     }
 </style>

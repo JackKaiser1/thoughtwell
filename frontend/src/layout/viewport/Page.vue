@@ -1,6 +1,8 @@
 <script setup lang="ts">
     import { computed, ref } from "vue";
     import { useSelectedPageStore } from "@/stores/selected-pages";
+    import { serverURL } from "@/constants";
+import { apiErrorHandler, printError } from "@/lib/errorHandler";
 
     const props = defineProps({
         pageId: String,
@@ -24,12 +26,14 @@
             return false;
         }
     });
+
 </script>
 
 <template>
     <div class="page" 
         :style="isPageSelected ? { borderColor: 'rgb(0, 128, 0)' } : { border: 'none' }"
-        @click="select">
+        @click="select"
+        >
         <p>{{ message }}</p>
     </div>
 </template>

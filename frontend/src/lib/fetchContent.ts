@@ -2,6 +2,7 @@ import { serverURL } from "@/constants";
 import { apiErrorHandler, printError } from "./errorHandler";
 import { type VisitedNotebook, useCurrentNotebookStore } from "@/stores/current-notebook";
 import { type NotebookContentResponse } from "@/types/response";
+import { useSelectedNotebookStore } from "@/stores/selected-notebook";
 
 
 export async function fetchNotebookContent(notebook: VisitedNotebook) {
@@ -32,11 +33,9 @@ export async function fetchNotebookContent(notebook: VisitedNotebook) {
                 useCurrentNotebookStore().revisitNotebook(result, notebook);
             } else {
                 useCurrentNotebookStore().openNotebook(result, notebook);
-                // console.log(useCurrentNotebookStore().currentNotebookContent);
-                // console.log(useCurrentNotebookStore().visitedNotebooksArray);
             }
 
-            
+            useSelectedNotebookStore().clearSelectedNotebook();
 
         
         } catch (err) {
