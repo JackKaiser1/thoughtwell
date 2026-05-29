@@ -2,12 +2,14 @@
     import { ref, useTemplateRef } from 'vue';
     import AddNotebookButton from './context-menu/AddNotebookButton.vue';
     import ClearPageSelection from './context-menu/ClearPageSelectionButton.vue';
+    import AddPagesToNotebook from './context-menu/AddPagesToNotebook.vue';
 
     const menuX = ref(0);
     const menuY = ref(0);
     const isShone = ref(false);
 
-    const newNotebook = useTemplateRef("newNotebook")
+    const newNotebook = useTemplateRef("newNotebook");
+    const addPagesToNotebook = useTemplateRef("addPagestoNotebook");
 
     function showMenu(event: MouseEvent) {
         isShone.value = true;
@@ -18,6 +20,7 @@
     function closeMenu() {
         isShone.value = false;
         newNotebook.value?.unClicked();
+        addPagesToNotebook.value?.unClicked();
     }
 
     defineExpose({
@@ -34,6 +37,8 @@
         <AddNotebookButton ref="newNotebook"/>
         <br>
         <ClearPageSelection />
+        <br>
+        <AddPagesToNotebook ref="addPagestoNotebook"/>
     </div>
 </template>
 
