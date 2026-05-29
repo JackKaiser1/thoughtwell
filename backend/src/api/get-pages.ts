@@ -46,9 +46,6 @@ export async function handlerGetLoosePages(req: Request, res: Response) {
     const userId = verifyUUID(res.locals.userId);
 
     const loosePageRecords = await getLoosePages(db, userId);
-    if (loosePageRecords.length < 1) {
-        throw new NotFoundError("Loose pages not found");
-    }
 
     printProperties(loosePageRecords, "pageContent");
 
