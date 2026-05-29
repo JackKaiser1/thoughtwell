@@ -3,7 +3,9 @@
     import AddNotebookButton from './context-menu/AddNotebookButton.vue';
     import ClearPageSelection from './context-menu/ClearPageSelectionButton.vue';
     import AddPagesToNotebook from './context-menu/AddPagesToNotebook.vue';
-import DeletePageButton from './context-menu/DeletePageButton.vue';
+    import DeletePageButton from './context-menu/DeletePageButton.vue';
+    import DeleteNotebookButton from './context-menu/DeleteNotebookButton.vue';
+import ClearNotebookSelectionButton from './context-menu/ClearNotebookSelectionButton.vue';
 
     const menuX = ref(0);
     const menuY = ref(0);
@@ -37,11 +39,15 @@ import DeletePageButton from './context-menu/DeletePageButton.vue';
     <div class="contextMenu" :style="{ top: menuY + 'px', left: menuX + 'px' }">
         <AddNotebookButton ref="newNotebook"/>
         <br>
-        <ClearPageSelection />
-        <br>
         <AddPagesToNotebook ref="addPagestoNotebook"/>
         <br>
+        <ClearPageSelection />
+        <br>
+        <ClearNotebookSelectionButton />
+        <br>
         <DeletePageButton />
+        <br>
+        <DeleteNotebookButton />
     </div>
 </template>
 
