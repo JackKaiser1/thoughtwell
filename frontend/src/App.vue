@@ -16,7 +16,7 @@
     margin: 0;
     padding: 0;
     font-family: Arial, Helvetica, sans-serif;
-    background-color: rgb(37, 37, 37);
+    background-color: rgb(46, 46, 46);
   }
 
   .mainMenuButton {

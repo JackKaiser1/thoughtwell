@@ -13,7 +13,6 @@
         <hr>
         <LoosePagesButton />
         <WriteModeButton />
-        <ReadModeButton />
         <hr>
         <UserOptions />
     </div>
@@ -35,8 +34,10 @@
         flex-direction: column;
         display: flex;
         position: relative;
-        background-color: rgb(77, 77, 77);
+        background-color: rgb(43, 43, 43);
         width: 7dvw;
         height: 100dvh;
+        /* border-right: 3px rgb(56, 56, 56) solid; */
+        box-shadow: 1px 1px 5px rgb(28, 28, 28);
     }
 </style>

@@ -53,9 +53,9 @@
 </script>
 
 <template>
-    <div class="contextButton" 
+    <button class="contextMenuButton" 
         @click="buttonClicked"
-        v-if="!isClicked">Add New Notebook</div>
+        v-if="!isClicked">Add New Notebook</button>
 
     <div class="createNotebookMenu" v-else>
         <form class="createNotebookForm">
@@ -63,7 +63,7 @@
             <br>
             <input class="notebookInput" type="text" v-model="notebookName">
             <br>
-            <button type="button" @click="createNewNotebook">Create</button>
+            <button type="button" class="contextMenuButton" @click="createNewNotebook">Create</button>
         </form>
     </div>
     

@@ -127,7 +127,7 @@
     }
 
     .containerLogin {
-        background-color: rgb(44, 44, 44);
+        background-color: rgb(43, 43, 43);
         display: flex;
         justify-content: center;
         align-items: center;

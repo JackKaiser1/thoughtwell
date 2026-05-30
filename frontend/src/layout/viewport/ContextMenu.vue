@@ -15,13 +15,12 @@ import ClearNotebookSelectionButton from './context-menu/ClearNotebookSelectionB
     const addPagesToNotebook = useTemplateRef("addPagestoNotebook");
 
     function showMenu(event: MouseEvent) {
-        isShone.value = true;
+        isShone.value = !isShone.value;
         menuX.value = event.clientX;
         menuY.value = event.clientY;
     }
 
     function closeMenu() {
-        isShone.value = false;
         newNotebook.value?.unClicked();
         addPagesToNotebook.value?.unClicked();
     }
@@ -53,20 +52,38 @@ import ClearNotebookSelectionButton from './context-menu/ClearNotebookSelectionB
 
 <style>
     .contextMenu {
-        background-color: rgb(22, 22, 22);
+        background-color: rgb(20, 20, 20);
         height: auto;
         width: 10rem;
-        border-radius: 3px;
+        border-radius: 1.8px;
         position: fixed;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
+        box-shadow: 0px 0px 4px 1px rgb(33, 33, 33);
         top: 0px;
         left: 0px;
         z-index: 10;
     }
 
+    .contextMenuButton {
+        font-size: clamp(0.20rem, 0.20rem + 1vw, 0.8rem);
+        color: white;
+        background-color: inherit;
+        border: none;
+        box-shadow: 0px 0px 0px 0px rgb(40, 40, 40);
+        padding: 0.3rem 0.5rem;
+        transition: background-color 0.15s box-shadow 0.15s;
+        width: 100%;
+        height: 3rem;
+        margin: 0;
+    }
+
+    .contextMenuButton:hover {
+        background-color: rgb(30, 30, 30);
+        box-shadow: 0px 0px 11px 3px rgba(66, 66, 66, 0.2);
+    }
     
 
 </style>

@@ -29,7 +29,9 @@
         <div @dblclick="fetchNotebookContent(notebook)" 
              @click="useSelectedNotebookStore().selectNotebook(notebookId as string)"
              class="notebook"
-             :style="isNotebookSelected ? { borderColor: 'rgb(0, 128, 0)' } : { border: 'none' } ">
+             :style="isNotebookSelected ? { boxShadow: '3px 3px 15px rgb(95, 95, 95)' } : { border: 'none' } "
+             spellcheck="false"
+             contenteditable="false">
             <p>{{ name }}</p>   
         </div>
     </RouterLink>
@@ -38,11 +40,12 @@
 
 <style>
     .notebook {
-        background-color: rgb(23, 23, 23);
+        background-color: rgb(22, 22, 22);
+        text-decoration: none;
         color: rgb(255, 255, 255);
         font-size: 0.9rem;
-        height: 13rem;
-        width: 8rem;
+        height: 19.5rem;
+        width: 12rem;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -52,5 +55,6 @@
         border-width: 5px;
         border-style: solid;
         border-color: transparent;
+        box-shadow: 3px 3px 5px rgb(11, 11, 11);
     }
 </style>
