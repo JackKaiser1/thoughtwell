@@ -7,7 +7,7 @@
     import NotebookContent from './viewport/NotebookContent.vue';
     import BreadCrumbs from './viewport/BreadCrumbs.vue';
     import ContextMenu from './viewport/ContextMenu.vue';
-    import { onMounted, useTemplateRef, ref } from 'vue';
+    import { onMounted, useTemplateRef, ref, computed } from 'vue';
     import WriteMode from './viewport/WriteMode.vue';
     import { homeRoute, loosePagesRoute, notebookContentRoute, writeModeRoute } from "@/constants";
     import { useSelectedPageStore } from '@/stores/selected-pages.ts';
@@ -16,6 +16,9 @@
     
     const menu = useTemplateRef("contextMenu");
 
+    const contentMode = computed(() => {
+        return route.fullPath === homeRoute || route.fullPath === loosePagesRoute || route.fullPath === notebookContentRoute;
+    });
     
     onMounted(() => {
         console.log("done");
@@ -25,7 +28,7 @@
 <template>
     <div class="viewPortbackground" 
         @contextmenu.prevent="menu?.showMenu($event)" 
-        @auxclick="menu?.closeMenu()"> 
+        @mousedown.right="menu?.closeMenu()"> 
 
         <ContextMenu ref="contextMenu" 
             v-show="menu?.isShone"/>
@@ -35,13 +38,13 @@
         </div>
         
 
-        <div class="contentContainer" >
+        <div class="contentContainer" v-if="contentMode">
             <Home v-if="route.fullPath === homeRoute"/>
             <LoosePagesMode v-else-if="route.fullPath === loosePagesRoute"/>
             <NotebookContent v-else-if="route.fullPath === notebookContentRoute"/>
         </div>   
 
-        <div class="writeModeContainer">
+        <div class="writeModeContainer" v-else>
             <WriteMode v-if="route.fullPath === writeModeRoute"/>
         </div>
     </div>
@@ -66,7 +69,13 @@
         flex-direction: row;
         flex-wrap: wrap;
         overflow-y: scroll;
+        margin-left: 2rem;
+        height: 85dvh;
     }
+
+        .contentContainer::-webkit-scrollbar {
+            background-color: inherit;
+        }
 
     .writeModeContainer {
         position: relative;
@@ -76,7 +85,6 @@
     }
 
     .viewPortbackground {
-        background-color: rgb(54, 54, 54);
         height: 100dvh;
         width: 93dvw;
     }

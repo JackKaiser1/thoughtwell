@@ -31,7 +31,7 @@ import { apiErrorHandler, printError } from "@/lib/errorHandler";
 
 <template>
     <div class="page" 
-        :style="isPageSelected ? { borderColor: 'rgb(0, 128, 0)' } : { border: 'none' }"
+        :style="isPageSelected ? { boxShadow: '3px 3px 15px rgb(95, 95, 95)' } : { border: 'none' }"
         @click="select"
         >
         <p>{{ message }}</p>
@@ -43,15 +43,19 @@ import { apiErrorHandler, printError } from "@/lib/errorHandler";
         background-color: white;
         color: black;
         font-size: 0.9rem;
-        height: 13rem;
-        width: 8rem;
+        height: 19.5rem;
+        width: 12rem;
         display: flex;
         justify-content: center;
         align-items: center;
         padding: 1rem;
         margin: 1rem;
-        border: none;
-        border-width: 5px;
-        border-style: solid;
+        box-shadow: 3px 3px 5px rgb(11, 11, 11);
+        overflow-y: scroll;
+    }
+
+    .page::-webkit-scrollbar {
+        width: 10px;
+        background-color: rgb(255, 255, 255);
     }
 </style>

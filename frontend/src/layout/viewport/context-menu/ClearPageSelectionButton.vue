@@ -9,7 +9,8 @@
 
 <template>
         <button v-if="useSelectedPageStore().selectedPages.size"
-            @click="clearPages()">Clear Page Selection</button>
+            @click="clearPages()"
+            class="contextMenuButton">Clear Page Selection</button>
 </template>
 
 <style></style>

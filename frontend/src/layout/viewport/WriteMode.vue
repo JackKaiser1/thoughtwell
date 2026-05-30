@@ -36,11 +36,9 @@
 <template>
     <div>
         <form>
-            <label>Write Mode</label>
-            <br>
             <textarea class="writeModeTextArea" v-model="note" rows="8" cols="80">{{note}}</textarea>
             <br>
-            <button class="$style.logoutButton" type="button" @click="writeNote">Write Note</button>
+            <button class="mainMenuButton" type="button" @click="writeNote">Write Note</button>
         </form>
     </div>
 
@@ -49,11 +47,16 @@
 <style>
     .writeModeTextArea {
         font-size: 1rem;
-        background-color: rgb(36, 36, 36);
-        color: white;
+        background-color: rgb(255, 255, 255);
+        color: rgb(0, 0, 0);
         border: none;
         padding: 2rem;
     }                   
+
+    .writeModeLabel {
+        color: white;
+        font-size: 2rem;
+    }
 
     .writeNoteButton {
         background-color: rgb(123, 123, 123);

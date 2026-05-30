@@ -45,7 +45,9 @@
 </script>
 
 <template>
-    <button v-if="isSinglePageSelected" @click="deletePage(pageToDelete)">Delete page</button>
+    <button v-if="isSinglePageSelected" 
+        @click="deletePage(pageToDelete)"
+        class="contextMenuButton">Delete page</button>
 </template>
 
 <style></style>

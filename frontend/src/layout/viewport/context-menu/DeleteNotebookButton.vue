@@ -36,7 +36,9 @@
 </script>
 
 <template>
-    <button v-if="isCurrentNotebookValid" @click="deleteNotebook(useSelectedNotebookStore().selectedNotebook)">Delete notebook</button>
+    <button v-if="isCurrentNotebookValid" 
+        @click="deleteNotebook(useSelectedNotebookStore().selectedNotebook)"
+        class="contextMenuButton">Delete notebook</button>
 </template>
 
 <style></style>

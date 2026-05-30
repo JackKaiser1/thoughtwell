@@ -50,5 +50,10 @@
         height: auto;
         width: 100%;
         padding: 1rem;
+        transition: transform 0.09s;
+    }
+
+    .homeButton:hover {
+        transform: scale(1.15);
     }
 </style>

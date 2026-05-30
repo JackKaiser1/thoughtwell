@@ -14,7 +14,6 @@ import SideBar from './layout/SideBar.vue';
 
 <style>
     .containerLayout {
-        background-color: aquamarine;
         display: flex;
         justify-content: left;
         flex-direction: row;

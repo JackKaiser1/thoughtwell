@@ -14,7 +14,8 @@
 
 <template>
         <button v-if="isCurrentNotebookValid"
-            @click="clearNotebookSelection()">Clear notebook selection</button>
+            @click="clearNotebookSelection()" 
+            class="contextMenuButton">Clear notebook selection</button>
 </template>
 
 <style></style>

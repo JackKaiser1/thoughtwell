@@ -53,11 +53,12 @@
 </script>
 
 <template>
-    <button @click="buttonClicked"
+    <button class="contextMenuButton" @click="buttonClicked"
         v-if="!isClicked">Add pages to notebook</button>
 
     <div v-else>
         <button v-for="notebook in useCurrentNotebookStore().currentNotebookContent.notebooks"
+            class="contextMenuButton"
             @click="addPagesToNotebook(notebook)">{{ notebook.notebookName }}</button>
 
     </div>

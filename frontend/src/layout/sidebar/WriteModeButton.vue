@@ -14,5 +14,10 @@ import { writeModeRoute } from '@/constants';
         height: auto;
         width: 100%;
         padding: 1rem;
+        transition: transform 0.09s;
+    }
+
+    .writeModeButton:hover {
+        transform: scale(1.15);
     }
 </style>

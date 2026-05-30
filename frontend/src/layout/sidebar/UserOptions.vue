@@ -60,13 +60,15 @@
    <div class="userOptionsContainer">
         <p class="usernameSidebar">{{ username }} </p>
 
-        <button type="button" class="logoutButton" @click="logoutUser">Logout</button>
+        <button type="button" class="mainMenuButton logoutButton" @click="logoutUser">Logout</button>
         <br>
-        <button type="button" @click="deleteUserClicked" v-if="!isClicked">Delete user</button>
+        <button type="button" class="mainMenuButton" @click="deleteUserClicked" v-if="!isClicked">Delete user</button>
         
         <div v-else>
-            <button type="button" @click="deleteUser">Confirm</button>
-            <button type="button" @click="deleteUserCanceled">Cancel</button>
+            <button type="button" class="mainMenuButton" @click="deleteUser">Confirm</button>
+            <br>
+            <br>
+            <button type="button" class="mainMenuButton" @click="deleteUserCanceled">Cancel</button>
         </div>
    </div>
 </template>
@@ -74,7 +76,7 @@
 <style>
     .userOptionsContainer {
         display: flex;
-        align-content: center;
+        justify-content: center;
         flex-direction: column;
         align-items: center;
     }
@@ -86,18 +88,8 @@
         height: 1vh;
     }
 
-    .logoutButton {
-        font-size: clamp(0.25rem, 0.25rem + 1vw, 1rem);
-        color: white;
-        margin-top: 2rem;
-        background-color: grey;
-        border: none;
-        padding: 0.3rem 0.5rem;
-        border-radius: 0.05rem;
-        transition: background-color 0.09s;
-    }
-        .logoutButton:hover {
-            background-color: rgb(147, 147, 147);
-            
-        }
+    
+        
+
+    
 </style>
