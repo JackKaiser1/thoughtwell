@@ -1,36 +1,6 @@
 <script setup lang="ts">
-    import { apiErrorHandler, printError } from '../../lib/errorHandler.js';
-    import { loosePagesRoute, serverURL } from '../../constants.js';
-    import { type PageResponse } from "../../types/response.js";
-    import { useLoosePageStore } from '@/stores/loose-pages.js';
-
-    async function fetchLoosePages() {
-        const url = `${serverURL}/api/loosePages`;
-
-        try {
-            const response = await fetch(url, {
-                method: "GET",
-                mode: "cors",
-                headers: {
-                    "Authorization": `Bearer ${sessionStorage.accessToken}`
-                }
-            });
-
-            if (!response.ok) {
-                apiErrorHandler(response);
-                throw new Error;
-            }
-
-            const result: PageResponse[] = await response.json();
-            console.log(result);
-
-            useLoosePageStore().loosePages = result;
-
-        } catch (err) {
-            printError
-        }
-        
-    }
+    import { loosePagesRoute } from '@/constants.js';
+    import { fetchLoosePages } from '@/lib/fetch-loose-pages';
 </script>
 
 <template>

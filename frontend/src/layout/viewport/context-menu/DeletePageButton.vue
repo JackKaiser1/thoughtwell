@@ -1,9 +1,14 @@
 <script setup lang="ts">
     import { useSelectedPageStore } from '@/stores/selected-pages';
     import { computed } from 'vue';
-    import { serverURL } from '@/constants';
+    import { homeRoute, loosePagesRoute, notebookContentRoute, serverURL } from '@/constants';
     import { apiErrorHandler, printError } from '@/lib/errorHandler';
     import { useCurrentNotebookStore } from '@/stores/current-notebook';
+    import { refreshNotebookContent } from '@/lib/fetchContent';
+    import { refreshLoosePages } from '@/lib/fetch-loose-pages';
+    import { useRoute } from 'vue-router';
+
+    const route = useRoute();
 
     const isSinglePageSelected = computed(() => {
         return useSelectedPageStore().selectedPages.size === 1;
@@ -35,7 +40,13 @@
                 throw new Error;
             }
 
-            useCurrentNotebookStore().refreshContent();
+            if (route.fullPath === homeRoute || route.fullPath === notebookContentRoute) {
+                await refreshNotebookContent();
+            } 
+            else if (route.fullPath === loosePagesRoute) {
+                await refreshLoosePages();
+            }
+
             useSelectedPageStore().clearSelectedPages();
 
         } catch (err) {

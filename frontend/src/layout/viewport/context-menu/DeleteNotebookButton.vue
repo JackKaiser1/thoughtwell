@@ -4,8 +4,12 @@
     import { apiErrorHandler, printError } from '@/lib/errorHandler';
     import { useSelectedNotebookStore } from '@/stores/selected-notebook';
     import { useCurrentNotebookStore } from '@/stores/current-notebook';
-    import { fetchNotebookContent, fetchContent } from '@/lib/fetchContent';
+    import { fetchNotebookContent, refreshNotebookContent } from '@/lib/fetchContent';
     import { fetchTopLevelNotebooks } from '@/lib/fetch-top-level';
+    import { useRoute } from 'vue-router';
+    import { homeRoute, notebookContentRoute } from '@/constants';
+
+    const route = useRoute();
 
     const isCurrentNotebookValid = computed(() => {
         return useSelectedNotebookStore().selectedNotebook !== "";
@@ -28,7 +32,9 @@
                 throw new Error;
             }
 
-            await fetchContent();
+            if (route.fullPath === homeRoute || route.fullPath === notebookContentRoute) {
+                await refreshNotebookContent();
+            }
 
             useSelectedNotebookStore().clearSelectedNotebook();
 
