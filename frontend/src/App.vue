@@ -3,7 +3,10 @@
   import Login from './Login.vue';
   import { ref, computed } from 'vue';
   import { useSessionStore } from './stores/session';
+  import { refreshAccessToken } from './lib/refresh-access.ts';
+  import { OneHourMs } from './constants.ts';
 
+  setInterval(refreshAccessToken, OneHourMs);
 </script>
 
 <template>
