@@ -5,15 +5,22 @@
 </script>
 
 <template>
-    <RouterLink :to="notebookContentRoute">
-        <button v-for="notebook in useCurrentNotebookStore().visitedNotebooksArray"
-            @click="fetchNotebookContent(notebook)"
-            class="breadCrumbs"> {{ notebook.notebookName }} / </button>
-    </RouterLink>
+    <div class="breadCrumbsContainer">
+        <RouterLink :to="notebookContentRoute">
+            <button v-for="notebook in useCurrentNotebookStore().visitedNotebooksArray"
+                @click="fetchNotebookContent(notebook)"
+                class="breadCrumbs"> {{ notebook.notebookName }} / </button>
+        </RouterLink>
+    </div>
 
 </template>
 
 <style>
+    .breadCrumbsContainer {
+        margin-top: 0.2rem;
+        margin-left: 1.2rem;
+    }
+
     .breadCrumbs {
         color: rgb(221, 221, 221);
         font-size: clamp(0.6rem, 0.6rem + 1vw, 1rem);

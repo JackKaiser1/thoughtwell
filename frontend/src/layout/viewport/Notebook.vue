@@ -29,7 +29,7 @@
         <div @dblclick="fetchNotebookContent(notebook)" 
              @click="useSelectedNotebookStore().selectNotebook(notebookId as string)"
              class="notebook"
-             :style="isNotebookSelected ? { boxShadow: '3px 3px 15px rgb(95, 95, 95)' } : { border: 'none' } "
+             :style="isNotebookSelected ? { boxShadow: '3px 3px 15px 1px rgb(89, 90, 150)' } : { border: 'none' } "
              spellcheck="false"
              contenteditable="false">
             <p>{{ name }}</p>   
@@ -56,5 +56,6 @@
         border-style: solid;
         border-color: transparent;
         box-shadow: 3px 3px 5px rgb(11, 11, 11);
+        transition: box-shadow 0.18s;
     }
 </style>

@@ -22,6 +22,10 @@
     background-color: rgb(46, 46, 46);
   }
 
+  a {
+      text-decoration: none;
+    }
+
   .mainMenuButton {
         font-size: clamp(0.25rem, 0.25rem + 1vw, 1rem);
         color: white;
