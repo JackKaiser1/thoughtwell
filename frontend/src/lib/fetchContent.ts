@@ -1,8 +1,10 @@
-import { serverURL } from "@/constants";
+import { homeRoute, notebookContentRoute, serverURL } from "@/constants";
 import { apiErrorHandler, printError } from "./errorHandler";
 import { type VisitedNotebook, useCurrentNotebookStore } from "@/stores/current-notebook";
 import { type NotebookContentResponse } from "@/types/response";
 import { useSelectedNotebookStore } from "@/stores/selected-notebook";
+import { fetchTopLevelNotebooks } from "./fetch-top-level";
+import { useRoute } from "vue-router";
 
 
 export async function fetchNotebookContent(notebook: VisitedNotebook) {
@@ -42,3 +44,16 @@ export async function fetchNotebookContent(notebook: VisitedNotebook) {
             printError(err);
         }
     }
+
+export async function refreshNotebookContent() {
+    const currentNotebook = useCurrentNotebookStore().currentNotebook;
+    if (currentNotebook !== undefined) {
+        await fetchNotebookContent(currentNotebook);
+    } else {
+        await fetchTopLevelNotebooks();
+    } 
+
+    console.log("Fetched Notebooks");
+
+}
+     

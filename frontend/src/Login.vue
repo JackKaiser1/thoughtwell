@@ -68,7 +68,7 @@
 <template>
     <div class="loginBackground">
         <div class="containerLogin"> 
-            <h1 class="title">ThoughtWell</h1>
+            <img src="./assets/thoughtwell full logo.png" class="logoFull">
                 <form>
                     <label for="username" class="loginLabel">Username</label>
                     <br>
@@ -81,9 +81,10 @@
                     <label for="password" class="loginLabel">Password</label>
                     <br>
                     <input v-model="password" 
-                        type="text" 
+                        type="password" 
                         name="password" 
                         id="password"
+                        autocomplete="off"
                         class="loginInput">
                     <br>
             
@@ -118,6 +119,7 @@
         color:rgb(0, 0, 0);
         font-size: clamp(0.5rem, 0.5rem + 1vw, 4rem);
         margin-bottom: 1rem;
+        width: 100%;
     }
 
     .title {
@@ -149,6 +151,12 @@
 
     .mainMenuButton-login {
         width: 10dvw;
+    }
+
+    .logoFull {
+        height: auto;
+        width: 80%;
+        margin-bottom: 2rem;
     }
 
 </style>

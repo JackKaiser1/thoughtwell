@@ -58,18 +58,19 @@
 
 <template>
    <div class="userOptionsContainer">
-        <p class="usernameSidebar">{{ username }} </p>
+        
 
-        <button type="button" class="mainMenuButton logoutButton" @click="logoutUser">Logout</button>
+        <button type="button" class="sidebarButton" @click="logoutUser">Logout</button>
         <br>
-        <button type="button" class="mainMenuButton" @click="deleteUserClicked" v-if="!isClicked">Delete user</button>
+        <button type="button" class="sidebarButton" @click="deleteUserClicked" v-if="!isClicked">Delete user</button>
         
         <div v-else>
-            <button type="button" class="mainMenuButton" @click="deleteUser">Confirm</button>
+            <button type="button" class="sidebarButton" @click="deleteUser">Confirm</button>
             <br>
             <br>
-            <button type="button" class="mainMenuButton" @click="deleteUserCanceled">Cancel</button>
+            <button type="button" class="sidebarButton" @click="deleteUserCanceled">Cancel</button>
         </div>
+        <p class="usernameSidebar">{{ username }} </p>
    </div>
 </template>
 
@@ -82,13 +83,37 @@
     }
 
     .usernameSidebar {
-        font-size: clamp(0.25rem, 0.25rem + 1vw, 1rem);
-        color: white;
-        width: 60%;
+        font-size: clamp(0.25rem, 0.25rem + 1vw, 0.7rem);
+        color: #ffffff66;
+        width: 95%;
         height: 1vh;
+        top: 95dvh;
+        position: absolute;
+        transition: color 0.09s;
     }
 
-    
+        .usernameSidebar:hover {
+            color: #ffffff;
+        }
+
+    .deleteUserButton {
+        font-size: 0.8rem;
+    }
+
+    .sidebarButton {
+        font-size: clamp(0.20rem, 0.20rem + 1vw, 0.85rem);
+        color: white;
+        background-color: inherit;
+        border: none;
+        padding: 0.3rem 0.5rem;
+        transition: background-color 0.09s;
+        margin-top: 1rem;
+        width: 100%;
+    }
+
+    .sidebarButton:hover {
+        background-color: rgb(74, 74, 74);
+    }
         
 
     

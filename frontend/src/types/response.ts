@@ -40,3 +40,7 @@ export type NotebookContentResponse = {
     pages: PageResponse[],
     notebooks: NotebookResponse[],
 }
+
+export type AccessTokenResponse = {
+    accessToken: string;
+}

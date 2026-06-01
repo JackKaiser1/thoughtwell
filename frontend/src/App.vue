@@ -3,7 +3,10 @@
   import Login from './Login.vue';
   import { ref, computed } from 'vue';
   import { useSessionStore } from './stores/session';
+  import { refreshAccessToken } from './lib/refresh-access.ts';
+  import { OneHourMs } from './constants.ts';
 
+  setInterval(refreshAccessToken, OneHourMs);
 </script>
 
 <template>
@@ -18,6 +21,10 @@
     font-family: Arial, Helvetica, sans-serif;
     background-color: rgb(46, 46, 46);
   }
+
+  a {
+      text-decoration: none;
+    }
 
   .mainMenuButton {
         font-size: clamp(0.25rem, 0.25rem + 1vw, 1rem);

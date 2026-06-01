@@ -1,13 +1,17 @@
 <script setup lang="ts">
     import { ref } from 'vue';
     import { useCurrentNotebookStore } from '@/stores/current-notebook';
-    import { serverURL } from '@/constants';
+    import { homeRoute, notebookContentRoute, serverURL } from '@/constants';
     import { apiErrorHandler, printError } from '@/lib/errorHandler';
     import { type PageResponse } from '@/types/response';
-    import { fetchNotebookContent } from '@/lib/fetchContent';
+    import { fetchNotebookContent, refreshNotebookContent } from '@/lib/fetchContent';
+    import { fetchTopLevelNotebooks } from '@/lib/fetch-top-level';
+    import { useRoute } from 'vue-router';
 
     const notebookName = ref("");
     const isClicked = ref(false);
+    
+    const route = useRoute();
 
     function buttonClicked() {
         isClicked.value = true;
@@ -41,9 +45,8 @@
                 throw new Error;
             }
             
-            const currentNotebook = useCurrentNotebookStore().currentNotebook;
-            if (currentNotebook !== undefined) {
-                await fetchNotebookContent(currentNotebook);
+            if (route.fullPath === homeRoute || route.fullPath === notebookContentRoute) {
+                await refreshNotebookContent();
             }
 
         } catch (err) {
