@@ -41,7 +41,7 @@
 
 <template>
     <RouterLink to="/home">
-        <img @click="fetchTopLevelNotebooks" class="homeButton" src="../../assets/sidebar/thoughtwell logo.png">
+        <img @click="fetchTopLevelNotebooks" class="homeButton" src="../../assets/sidebar/thoughtwell logo v2.png">
     </RouterLink>
 </template>
 
@@ -49,7 +49,7 @@
     .homeButton {
         height: auto;
         width: 100%;
-        padding: 1rem;
+        padding: 0.9rem;
         transition: transform 0.09s;
     }
 
