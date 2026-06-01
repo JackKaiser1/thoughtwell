@@ -4,6 +4,8 @@
     import { apiErrorHandler, printError } from '@/lib/errorHandler';
     import { useSelectedNotebookStore } from '@/stores/selected-notebook';
     import { useCurrentNotebookStore } from '@/stores/current-notebook';
+    import { fetchNotebookContent, fetchContent } from '@/lib/fetchContent';
+    import { fetchTopLevelNotebooks } from '@/lib/fetch-top-level';
 
     const isCurrentNotebookValid = computed(() => {
         return useSelectedNotebookStore().selectedNotebook !== "";
@@ -26,7 +28,8 @@
                 throw new Error;
             }
 
-            useCurrentNotebookStore().refreshContent();
+            await fetchContent();
+
             useSelectedNotebookStore().clearSelectedNotebook();
 
         } catch (err) {

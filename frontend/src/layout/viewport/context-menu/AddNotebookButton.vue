@@ -4,7 +4,7 @@
     import { serverURL } from '@/constants';
     import { apiErrorHandler, printError } from '@/lib/errorHandler';
     import { type PageResponse } from '@/types/response';
-    import { fetchNotebookContent } from '@/lib/fetchContent';
+    import { fetchNotebookContent, fetchContent } from '@/lib/fetchContent';
     import { fetchTopLevelNotebooks } from '@/lib/fetch-top-level';
 
     const notebookName = ref("");
@@ -42,12 +42,7 @@
                 throw new Error;
             }
             
-            const currentNotebook = useCurrentNotebookStore().currentNotebook;
-            if (currentNotebook !== undefined) {
-                await fetchNotebookContent(currentNotebook);
-            } else {
-                await fetchTopLevelNotebooks();
-            }
+            await fetchContent();
 
         } catch (err) {
             printError(err)
