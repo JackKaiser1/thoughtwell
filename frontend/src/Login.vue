@@ -81,9 +81,10 @@
                     <label for="password" class="loginLabel">Password</label>
                     <br>
                     <input v-model="password" 
-                        type="text" 
+                        type="password" 
                         name="password" 
                         id="password"
+                        autocomplete="off"
                         class="loginInput">
                     <br>
             
