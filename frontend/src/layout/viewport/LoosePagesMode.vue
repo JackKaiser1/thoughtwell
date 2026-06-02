@@ -6,7 +6,8 @@
 <template>
     <Page v-for="page in useLoosePageStore().loosePages" 
             :page-content="page.pageContent"
-            :page-id="page.id"/> 
+            :page-id="page.id"
+            :key="page.id"/> 
 </template>
 
 <style></style>

@@ -20,13 +20,21 @@ import { authMiddleware, apiKeyAuthMiddleware } from "./api/middleware/auth-midd
 import { handlerRevoke } from "./api/revoke.js";
 import cors from "cors";
 import { handlerDeleteNotebook } from "./api/delete-notebook.js";
+import path from "node:path"
+import { fileURLToPath } from "node:url";
 
 export const app = express();
 const PORT = 8080;
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const staticPath = path.join(__dirname, "../../frontend/dist");
  
 app.use(loggingMiddleware);
 app.use(express.json());
 app.use(cors());
+
+app.use("/", express.static(staticPath));
+
 
 app.get("/api/readiness", async (req, res, next) => {
     Promise.resolve(await handlerReadiness(req, res)).catch(next);
@@ -127,6 +135,9 @@ app.delete("/api/notebooks/:notebookId", authMiddleware, async (req, res, next) 
 });
 
 
+app.get(/.*/, (req, res) => {
+    res.sendFile(path.join(staticPath, "index.html"));
+});
 
 app.use(errorMiddleware);
 

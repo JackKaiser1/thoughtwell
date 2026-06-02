@@ -101,7 +101,7 @@
     }
 
     .sidebarButton {
-        font-size: clamp(0.20rem, 0.20rem + 1vw, 0.85rem);
+        font-size: clamp(0.20rem, 0.20rem + 1vw, 0.80rem);
         color: white;
         background-color: inherit;
         border: none;
