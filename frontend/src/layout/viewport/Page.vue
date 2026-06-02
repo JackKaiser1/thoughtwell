@@ -61,6 +61,7 @@
 <style>
     .page {
         background-color: white;
+        font-family: 'Times New Roman', Times, serif;
         color: black;
         font-size: clamp(0.4rem, 0.6rem + 0.5dvw, 1rem);
         height: 19.5rem;
@@ -99,6 +100,7 @@
 
     .page-readMode {
         background-color: white;
+        font-family: 'Times New Roman', Times, serif;
         position: fixed;
         color: black;
         font-size: clamp(0.6rem, 0.8rem + 0.5dvw, 2rem);

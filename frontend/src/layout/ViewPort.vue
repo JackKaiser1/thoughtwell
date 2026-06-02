@@ -51,9 +51,6 @@
 </template>
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
 
     .breadCrumbsContainer {
         display: flex;
@@ -61,6 +58,10 @@
         align-items: center;
         justify-content: left;
         height: 4rem;
+        width: 100%;
+        background-color: rgb(58, 58, 58);
+        box-shadow: 0px 1px 1px rgb(39, 39, 39);
+        border-color: rgb(255, 255, 255);
     }
 
     .contentContainer {
@@ -69,7 +70,8 @@
         flex-direction: row;
         flex-wrap: wrap;
         overflow-y: scroll;
-        margin-left: 2rem;
+        margin-left: 1rem;
+        margin-top: 1rem;
         height: 85dvh;
     }
 
@@ -86,6 +88,6 @@
 
     .viewPortbackground {
         height: 100dvh;
-        width: 93dvw;
+        width: 100dvw;
     }
 </style>
