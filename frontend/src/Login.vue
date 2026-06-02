@@ -1,9 +1,13 @@
 <script setup lang="ts">
     import { ref } from 'vue';
     import { type LoginUserResponse, type CreateUserResponse } from "../src/types/response.js";
-    import { serverURL } from "./constants.js";
+    import { homeRoute, serverURL } from "./constants.js";
     import { apiErrorHandler, printError } from './lib/errorHandler.js';
     import { useSessionStore } from './stores/session.js';
+    import { fetchTopLevelNotebooks } from './lib/fetch-top-level.js';
+    import { useRouter } from 'vue-router';
+
+    const router = useRouter();
 
     const userName = ref("");
     const password = ref("");
@@ -42,7 +46,8 @@
             sessionStorage.setItem("userName", userRecord.userName);
 
             useSessionStore().loginSession();
-            console.log(sessionStorage);
+            router.push(homeRoute);
+            await fetchTopLevelNotebooks();
 
         } catch (err) {
             printError(err);
