@@ -31,8 +31,6 @@ const staticPath = path.join(__dirname, "../../frontend/dist");
  
 app.use(loggingMiddleware);
 app.use(express.json());
-app.use(cors());
-
 app.use("/", express.static(staticPath));
 
 
