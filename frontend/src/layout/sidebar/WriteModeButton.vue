@@ -13,7 +13,7 @@ import { writeModeRoute } from '@/constants';
     .writeModeButton {
         height: auto;
         width: 100%;
-        padding: 1rem;
+        padding: 12px;
         transition: transform 0.09s;
     }
 

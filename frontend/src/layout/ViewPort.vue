@@ -57,12 +57,20 @@
         flex-direction: row;
         align-items: center;
         justify-content: left;
+        flex-wrap: wrap;
         height: 4rem;
         width: 100%;
+        overflow-y: scroll;
+        text-wrap: pretty;
         background-color: rgb(58, 58, 58);
         box-shadow: 0px 1px 1px rgb(39, 39, 39);
         border-color: rgb(255, 255, 255);
     }
+
+        .breadCrumbsContainer::-webkit-scrollbar {
+            background-color: inherit;
+            width: 0px;
+        }
 
     .contentContainer {
         position: relative;

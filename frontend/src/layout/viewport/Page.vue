@@ -73,6 +73,7 @@
         margin: 1rem;
         box-shadow: 3px 3px 5px rgb(11, 11, 11);
         overflow-y: scroll;
+        text-wrap: balance;
         transition: box-shadow 0.18s;
         user-select: none;
     }
@@ -95,7 +96,7 @@
 
     @keyframes enlargeAnimation {
         from { height: 19.5rem; width: 12rem; }
-        to { height: 30rem; width: 60rem; }
+        to { height: 90dvh; width: 70dvw; }
     }
 
     .page-readMode {
@@ -104,8 +105,8 @@
         position: fixed;
         color: black;
         font-size: clamp(0.6rem, 0.8rem + 0.5dvw, 2rem);
-        height: 30rem;
-        width: 60rem;
+        height: 90dvh;
+        width: 70dvw;
         display: flex;
         justify-content: left;
         align-items: baseline;
