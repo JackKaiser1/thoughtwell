@@ -122,10 +122,17 @@
 
     .loginInput {
         color:rgb(0, 0, 0);
+        background-color: rgb(255, 255, 255);
+        border: none;
         font-size: clamp(0.5rem, 0.5rem + 1vw, 4rem);
         margin-bottom: 1rem;
         width: 100%;
     }
+
+        .loginInput:focus {
+            box-shadow: 0px 0px 5px 1px rgb(182, 182, 182);
+            outline: none;
+        }
 
     .title {
         font-family:'Times New Roman', Times, serif;
