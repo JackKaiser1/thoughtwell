@@ -13,7 +13,7 @@
     .homeButton {
         height: auto;
         width: 100%;
-        padding: 0.9rem;
+        padding: 12px;
         transition: transform 0.09s;
     }
 
