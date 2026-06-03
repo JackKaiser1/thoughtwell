@@ -46,13 +46,14 @@
 
 <style>
     .writeModeTextArea {
-        font-size: 1rem;
+        font-size: clamp(0.5rem, 0.5rem + 1dvw, 1rem);
         font-family: Arial, Helvetica, sans-serif;
         background-color: rgb(58, 58, 58);
         color: rgb(255, 255, 255);
         border: none;
         padding: 2rem;
         box-shadow: 2px 2px 3px rgb(34, 34, 34);
+        width: 55dvw;
 
         transition: background-color 0.2s;
     }                   
@@ -61,6 +62,11 @@
             background-color: rgb(73, 73, 73);
             outline: none;
         }   
+
+        .writeModeTextArea::-webkit-scrollbar {
+            background-color: inherit;
+            width: 0px;
+        }
 
     .writeModeLabel {
         color: white;
