@@ -73,6 +73,7 @@
         margin: 1rem;
         box-shadow: 3px 3px 5px rgb(11, 11, 11);
         overflow-y: scroll;
+        text-wrap: balance;
         transition: box-shadow 0.18s;
         user-select: none;
     }
