@@ -98,6 +98,7 @@
 
     .contextMenuLabel {
         font-size: 1rem;
+        color: transparent;
     }
 
     .createNotebookForm {
