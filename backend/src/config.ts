@@ -1,7 +1,7 @@
 import { env } from "node:process";
 import { type MigrationConfig } from "drizzle-orm/migrator";
  
-process.loadEnvFile()
+// process.loadEnvFile("../.env")
 
 if (!process.env.DB_URL) {
     throw new Error("Database connection string not found");

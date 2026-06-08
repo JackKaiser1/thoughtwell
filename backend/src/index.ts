@@ -139,6 +139,6 @@ app.get(/.*/, (req, res) => {
 
 app.use(errorMiddleware);
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
