@@ -6,7 +6,8 @@
     "build": "npx tsc",
     "start": "node dist/index.js",
     "dev": "npx tsc && node dist/index.js",
-    "test": "vitest"
+    "test": "vitest",
+    "migrate": "npx drizzle-kit migrate"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
