@@ -1,19 +1,53 @@
 ![Thoughtwell](./assets/thoughtwell%20full%20logo%20small.svg)
 
 
----
+# Create Notebooks With Content Larger Than The Container 
 
-
-Thoughtwell is a web application for working out new ideas.  It allows users to create and write to flexible notebooks that can be nested to form a hierarchical structure.  This provides the user with the ability to freely follow spontaneous thought to any level of specificity while establishing a record of the natural branching of one's ideas.  
+Thoughtwell is a web application for working out new ideas in flexible notebooks that can be nested to form a hierarchical structure.  This provides the user with the ability to freely follow spontaneous thought to any level of specificity while establishing a record of the natural branching of one's ideas.  
 
 
 ## Motivation
 
 
-I am a large proponent of taking notes when learning a new concept or building upon an idea.  I enjoy the kineticism and satisfying freedom that the classic pen and paper method allows for.  Though I try my best not to fix something that isn't broken, the stack of notebooks amassed on my desk led me to the realization that I needed a better way to organize this information.  If you're thinking the modern rich text editors of today would seem to be the next logical choice for a tool in which to write something down, I wouldn't blame you.  My problem with such tools is simple: there are too many options for my intended goal.  If my understanding of an abstract concept begins with the ability to write it in my own voice, then I want as little friction as possible between myself and that understanding.  I required a solution to record ideas in the same spontaneous fashion as I can with a pen and paper while granting myself an organizational capability beyond the physical limitations of the common notebook.  This led me to develop Thoughtwell, a program that allows a user to create digital notebooks where the content is larger than the container.
+I am a large proponent of taking notes when learning a new concept or building upon an idea.  I enjoy the kineticism and satisfying freedom that the classic pen and paper method allows for.  Though I try my best not to fix something that isn't broken, the stack of notebooks amassed on my desk led me to the realization that I needed a better way to organize this information.  If you're thinking the modern rich text editors of today would seem to be the next logical choice for a tool in which to write something down, I wouldn't blame you.  My problem with such tools is simple: there are too many options for my intended goal.  If my understanding of an abstract concept begins with the ability to write it in my own voice, then I want as little friction as possible between myself and that understanding.  I required a solution to record ideas in the same spontaneous fashion as I can with a pen and paper while granting myself an organizational capability beyond the physical limitations of the common notebook.  That solution was Thoughtwell.
 
 
-## Features
+## Quick Start 
+
+### Prerequisites
+
+- Linux or Windows with WSL
+- Docker
+
+
+### Installation - linux
+
+1. `git clone https://github.com/JackKaiser1/thoughtwell`
+    
+
+2. `cd thoughtwell`
+    
+
+
+3. `touch .env`
+
+
+4. Copy the following keys to the `.env` file and populate them
+
+    ```
+    SECRET=""
+    API_KEY=""
+    POSTGRES_PASSWORD=""
+    POSTGRES_USER=""
+    POSTGRES_DB=""
+    ```
+
+5. `docker compose up`
+
+6. Open a web browser and connect to `http://localhost:8080`
+
+
+## Features / Usage
 
 
 - Nested Notebooks
@@ -63,15 +97,55 @@ I am a large proponent of taking notes when learning a new concept or building u
     - Express
     - Drizzle ORM
 
-
-- Database
-    - PostgreSQL
-
-
 - Frontend
     - Typescript
     - Vue
     - Vue Router
     - Pinia
 
----
+- Database
+    - PostgreSQL
+
+## Contributing 
+
+If you wish to contribute to Thoughtwell, the following steps should help get you started with local development.  When you are ready to submit a change simply fork the repository and make a pull request to the `main` branch.
+
+### Prerequisites
+
+- Node.js 24.15.0
+- PostgreSQL 16.14
+
+  > Where running this application via a compose stack will handle database connection for you, running an instance directly on the host machine will require a database connection url to either a local postgreSQL instance or one running in a container. 
+
+    [Install PostgreSQL 16 Locally](https://www.postgresql.org/docs/16/tutorial-install.html)
+
+
+### Installation - Linux
+ 
+
+1. `git clone https://github.com/JackKaiser1/thoughtwell`
+
+2. `cd thoughtwell`
+
+3. `touch .env`
+
+4. Copy the following keys to the `.env` file and populate them
+
+    ```
+    DB_URL=""
+    SECRET=""
+    API_KEY=""
+    ```
+5. `cd frontend && npm install && npm run build && cd ..`
+
+6. `cd backend && npm install && npm run migrate`
+
+
+
+
+
+
+
+
+
+
