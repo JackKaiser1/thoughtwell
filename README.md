@@ -1,7 +1,8 @@
-![Thoughtwell](./assets/thoughtwell%20full%20logo%20small.svg)
+# Thoughtwell
 
+![Thoughtwell_demo](./assets/thoughtwell_demo_img.png)
 
-<h2 align="center">Create Notebooks With Content Larger Than The Container</h2>
+## Create Notebooks With Content Larger Than The Container
 
 Thoughtwell is a web application for working out new ideas in flexible notebooks that can be nested to form a hierarchical structure.  This provides the user with the ability to freely follow spontaneous thought to any level of specificity while establishing a record of the natural branching of one's ideas.  
 
