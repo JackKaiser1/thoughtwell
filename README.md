@@ -23,29 +23,69 @@ I am a large proponent of taking notes when learning a new concept or building u
 
 ### Installation - linux
 
-1. `git clone https://github.com/JackKaiser1/thoughtwell`
+1.  ```bash
+    mkdir thoughtwell
+    ```
     
+2.  ```bash
+    cd thoughtwell
+    ```
 
-2. `cd thoughtwell`
-    
-
-
-3. `touch .env`
-
+3.  ```bash
+    touch .env
+    ```
 
 4. Copy the following keys to the `.env` file and populate them
 
-    ```
-    SECRET=""
-    API_KEY=""
-    POSTGRES_PASSWORD=""
-    POSTGRES_USER=""
-    POSTGRES_DB=""
+    ```properties
+    SECRET=
+    API_KEY=
+    POSTGRES_PASSWORD=
+    POSTGRES_USER=
+    POSTGRES_DB=
     ```
 
-5. `docker compose up`
+5.  ```bash
+    touch compose.yaml
+    ```
 
-6. Open a web browser and connect to `http://localhost:8080`
+6. Copy the following to the `compose.yaml` file
+
+    ```yaml
+    services:
+        app:
+            image: jackkaiser1/thoughtwell
+            ports:
+                ["8080:8080"]
+            environment:
+                - DB_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+                - SECRET=${SECRET}
+                - API_KEY=${API_KEY}
+            command: sh -c "npm run migrate && npm run dev"
+            depends_on:
+                db:
+                    condition: service_healthy
+
+        db:
+            image: postgres:16.14-alpine
+            environment:
+                - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+                - POSTGRES_USER=${POSTGRES_USER}
+                - POSTGRES_DB=${POSTGRES_DB}
+            healthcheck:
+                test: ["CMD-SHELL", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""]
+                interval: 5s
+                timeout: 3s
+                retries: 5
+                start_period: 10s
+
+    ```
+
+7.  ```bash
+    docker compose up
+    ```
+
+8. Open a web browser and connect to `http://localhost:8080`
 
 
 ## Features / Usage
