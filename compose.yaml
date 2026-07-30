@@ -3,9 +3,20 @@ services:
     build: ./frontend
     ports:
       ["5173:5173"]
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /frontend
+          initial_sync: true
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./frontend/package.json
     depends_on:
       backend:
         condition: service_healthy
+
   backend:
     build: ./backend
     ports: 
@@ -21,6 +32,16 @@ services:
       timeout: 3s
       retries: 5
       start_period: 20s
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /backend
+          initial_sync: true
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./backend/package.json
     depends_on:
       db:
         condition: service_healthy
