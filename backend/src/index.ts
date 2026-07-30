@@ -22,6 +22,7 @@ import cors from "cors";
 import { handlerDeleteNotebook } from "./api/delete-notebook.js";
 import path from "node:path"
 import { fileURLToPath } from "node:url";
+import { config } from "./config.js";
 
 export const app = express();
 const PORT = 8080;
@@ -31,7 +32,11 @@ const staticPath = path.join(__dirname, "../../frontend/dist");
  
 app.use(loggingMiddleware);
 app.use(express.json());
-app.use("/", express.static(staticPath));
+app.use(cors());
+
+if (config.mode === "production") {
+    app.use("/", express.static(staticPath));
+}
 
 
 app.get("/api/readiness", async (req, res, next) => {
@@ -133,9 +138,12 @@ app.delete("/api/notebooks/:notebookId", authMiddleware, async (req, res, next) 
 });
 
 
-app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(staticPath, "index.html"));
-});
+if (config.mode === "production") {
+    app.get(/.*/, (req, res) => {
+        res.sendFile(path.join(staticPath, "index.html"));
+    });
+}
+
 
 app.use(errorMiddleware);
 

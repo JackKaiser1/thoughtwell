@@ -1,13 +1,47 @@
 services:
-  app:
-    build: .
+  frontend:
+    build: ./frontend
+    ports:
+      ["5173:5173"]
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /frontend
+          initial_sync: true
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./frontend/package.json
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  backend:
+    build: ./backend
     ports: 
       ["8080:8080"]
     environment:
       - DB_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       - SECRET=${SECRET}
       - API_KEY=${API_KEY}
-    command: sh -c "npm run migrate && npm run dev"
+      - MODE=${MODE}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8080/api/readiness"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /backend
+          initial_sync: true
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./backend/package.json
     depends_on:
       db:
         condition: service_healthy
