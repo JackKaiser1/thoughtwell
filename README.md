@@ -137,15 +137,6 @@ I am a large proponent of taking notes when learning a new concept or building u
 
 If you wish to contribute to Thoughtwell, the following steps should help get you started with local development. When you are ready to submit a change, simply fork the repository and make a pull request to the `main` branch.
 
-<!-- ### Prerequisites
-
-- Node.js 24.15.0
-- PostgreSQL 16.14
-
-  > Where running this application via a compose stack will handle database connection for you, running an instance directly on the host machine will require a database connection url to either a local postgreSQL instance or one running in a container.
-
-  [Install PostgreSQL 16 Locally](https://www.postgresql.org/docs/16/tutorial-install.html) -->
-
 ### Installation - Linux
 
 1. `git clone https://github.com/JackKaiser1/thoughtwell`
