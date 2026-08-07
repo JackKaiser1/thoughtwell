@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { getUsers, getUser } from "../db/queries/users.js";
 import { UserRecord } from "../db/schema.js";
-import { BadRequestError, NotFoundError, UnauthorizedError } from "./errors.js";
+import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from "./errors.js";
 import { type dbClient, db } from "../db/index.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
 import { SafeUserRecord } from "./create-user.js";
@@ -34,7 +34,7 @@ export async function handlerGetUser(req: Request, res: Response): Promise<void>
     
     const authenticatedUserId = verifyUUID(res.locals.userId);
     if (authenticatedUserId !== userRecord.id) {
-        throw new UnauthorizedError("Not authorized to access user resource");
+        throw new ForbiddenError("Not authorized to access user resource");
     }
 
     const safeUserRecord: SafeUserRecord = {
