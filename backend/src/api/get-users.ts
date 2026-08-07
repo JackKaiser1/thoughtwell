@@ -5,38 +5,27 @@ import { BadRequestError, NotFoundError, UnauthorizedError } from "./errors.js";
 import { type dbClient, db } from "../db/index.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
 import { SafeUserRecord } from "./create-user.js";
+import { printProperties } from "../lib/print-properties.js";
 
 
 export async function handlerGetUsers(req: Request, res: Response): Promise<void> {
     const users: UserRecord[] = await getUsers(db);
-    if (!users) {
+    if (users.length < 1) {
         throw new NotFoundError("Users not found");
     }
 
-    if (!users.length) {
-        console.log("Users table is empty");
-        res.status(200).send("OK");
-        return;
-    }
+    printProperties(users, "username");
 
-    console.log("-- Users:");
-    for (const user of users) {
-        console.log(`${user.userName}`);
-    }
-    console.log("--");
-
-    res.status(200).send({ users: users});
+    res.status(200).send({ users: users });
 }
 
 export async function handlerGetUser(req: Request, res: Response): Promise<void> {
-    const userId = req.params.userId;
-    if (!userId) {
+    const id = req.params.userId;
+    if (!id) {
         throw new BadRequestError("Must provide user Id as path parameter");
-    } else if (typeof userId !== "string") {
-        throw new BadRequestError("User Id must be a string");
-    }
+    } 
 
-    verifyUUID(userId);
+    const userId = verifyUUID(id);
             
     const userRecord = await getUser(db, userId);
     if (!userRecord) {
