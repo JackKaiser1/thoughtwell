@@ -9,19 +9,8 @@ import { addChildrenToNotebook } from "../lib/add-children.js";
 import { verifyChildrenToAdd } from "../lib/verify-childrenToAdd.js";
 
 export async function handlerAddPagesToNotebook(req: Request, res: Response) {
-    // const userId = req.body.userId;
-    // if (!userId) {
-    //     throw new BadRequestError("Payload must contain userId property");
-    // } else if (typeof userId !== "string") {
-    //     throw new BadRequestError("UserId must be a string");
-    // }
-
     const authenticatedUserId = verifyUUID(res.locals.userId);
     const authorizedPayload = await verifyChildrenToAdd(db, req.body, authenticatedUserId);
-
-    // if (authenticatedUserId !== userId) {
-    //     throw new UnauthorizedError("Not authorized to edit notebook");
-    // }
 
     const childParentRecords = await addChildrenToNotebook(db, authorizedPayload, deletePagesToNotebooks, createPagesToNotebooks, makeChildPage);
 
