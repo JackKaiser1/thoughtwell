@@ -1,9 +1,11 @@
-<script lang="ts">
-
+<script setup lang="ts">
+    import { sketchModeRoute } from '@/constants';
 </script>
 
 <template>
-    <img class="sketchModeButton" src="../../assets/sidebar/sketch mode graphic.png">
+    <RouterLink :to="sketchModeRoute">
+        <img class="sketchModeButton" src="../../assets/sidebar/sketch mode graphic.png">
+    </RouterLink>
 </template>
 
 <style>

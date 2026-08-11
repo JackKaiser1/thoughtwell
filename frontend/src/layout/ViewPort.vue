@@ -9,15 +9,19 @@
     import ContextMenu from './viewport/ContextMenu.vue';
     import { onMounted, useTemplateRef, ref, computed } from 'vue';
     import WriteMode from './viewport/WriteMode.vue';
-    import { homeRoute, loosePagesRoute, notebookContentRoute, writeModeRoute } from "@/constants";
+    import { homeRoute, loosePagesRoute, notebookContentRoute, sketchModeRoute, writeModeRoute } from "@/constants";
     import { useSelectedPageStore } from '@/stores/selected-pages.ts';
+    import SketchMode from './viewport/SketchMode.vue';
 
     const route = useRoute();
     
     const menu = useTemplateRef("contextMenu");
 
     const contentMode = computed(() => {
-        return route.fullPath === homeRoute || route.fullPath === loosePagesRoute || route.fullPath === notebookContentRoute;
+        return route.fullPath === homeRoute 
+                || route.fullPath === loosePagesRoute 
+                || route.fullPath === notebookContentRoute
+                || route.fullPath === sketchModeRoute;
     });
     
     onMounted(() => {
@@ -42,6 +46,7 @@
             <Home v-if="route.fullPath === homeRoute"/>
             <LoosePagesMode v-else-if="route.fullPath === loosePagesRoute"/>
             <NotebookContent v-else-if="route.fullPath === notebookContentRoute"/>
+            <SketchMode v-else-if="route.fullPath === sketchModeRoute"/>
         </div>   
 
         <div class="writeModeContainer" v-else>
