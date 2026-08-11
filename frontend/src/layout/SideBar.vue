@@ -4,6 +4,7 @@
     import ReadModeButton from './sidebar/ReadModeButton.vue';
     import UserOptions from './sidebar/UserOptions.vue';
     import WriteModeButton from './sidebar/WriteModeButton.vue';
+    import SketchModeButton from './sidebar/SketchModeButton.vue';
 
 </script>
 
@@ -12,6 +13,7 @@
         <HomeButton />
         <LoosePagesButton />
         <WriteModeButton />
+        <SketchModeButton />
         <hr>
         <UserOptions />
     </div>
