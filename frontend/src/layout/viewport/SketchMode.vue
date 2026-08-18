@@ -1,6 +1,9 @@
 <script setup lang="ts">
     import { onMounted, useTemplateRef, ref, computed } from 'vue';
     import p5 from "p5";
+    import { serverURL } from '@/constants';
+    import { printError } from '@/lib/errorHandler';
+    import { apiErrorHandler } from '@/lib/errorHandler';
 
     const pointSize = ref(10);
     var isPointSize
@@ -16,12 +19,14 @@
     });
 
 
-    var drawing: p5;
+    var currentSketch: p5;
+    var p5Canvas: p5.Renderer;
+
     const sketchContainer = useTemplateRef<HTMLElement | undefined>('sketch');
 
     const s = (sketch: p5) => {
         sketch.setup = () => {
-            sketch.createCanvas(250, 400);
+            p5Canvas = sketch.createCanvas(250, 400);
             sketch.background(255);
         };
 
@@ -34,10 +39,39 @@
         };
     }
 
-    function submit() {
+    async function submit() {
+        p5Canvas.elt.toBlob(async (blob) => {
+            const formData = new FormData();
+            try {
+                if (!blob) {
+                    throw new Error;
+                }
+
+                formData.append("sketch", blob, "sketch.png");
+
+                const url = `${serverURL}/api/sketches`;
+                const response = await fetch(url, {
+                    method: "POST",
+                    mode: "cors",
+                    body: formData,
+                    headers: {
+                        "Authorization": `Bearer ${sessionStorage.accessToken}`,
+                    }
+                });
+
+                if (!response.ok) {
+                    apiErrorHandler(response);
+                    throw new Error;
+                }
+
+            } catch (err) {
+                printError(err);
+            }
+        });
+
         if (sketchContainer.value){
-            drawing.setup();
-            drawing.draw();
+            currentSketch.setup();
+            currentSketch.draw();
         }
     }
     
@@ -60,7 +94,7 @@
 
     onMounted(() => {
         if (sketchContainer.value){
-            drawing = new p5(s, sketchContainer.value);
+            currentSketch = new p5(s, sketchContainer.value);
         }
 
     });
