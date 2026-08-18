@@ -23,6 +23,8 @@ import { handlerDeleteNotebook } from "./api/delete-notebook.js";
 import path from "node:path"
 import { fileURLToPath } from "node:url";
 import { config } from "./config.js";
+import { S3Client } from "@aws-sdk/client-s3";
+import { createBucket } from "./lib/create-bucket.js"
 
 export const app = express();
 const PORT = 8080;
@@ -37,6 +39,18 @@ app.use(cors());
 if (config.mode === "production") {
     app.use("/", express.static(staticPath));
 }
+
+const s3Client = new S3Client({
+    region: "REGION",
+    forcePathStyle: true,
+    credentials: {
+        accessKeyId: config.s3AccessKeyId,
+        secretAccessKey: config.s3SecretAccessKey,
+    },
+    endpoint: "http://minio-db:9000",
+});
+
+createBucket(s3Client, "sketches");
 
 
 app.get("/api/readiness", async (req, res, next) => {
