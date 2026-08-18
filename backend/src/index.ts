@@ -25,6 +25,8 @@ import { fileURLToPath } from "node:url";
 import { config } from "./config.js";
 import { S3Client } from "@aws-sdk/client-s3";
 import { createBucket } from "./lib/create-bucket.js"
+import { handlerCreateSketch } from "./api/create-sketch.js";
+import multer from "multer";
 
 export const app = express();
 const PORT = 8080;
@@ -51,6 +53,13 @@ const s3Client = new S3Client({
 });
 
 createBucket(s3Client, "sketches");
+
+const fileUploadMiddleware = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024,
+    }
+});
 
 
 app.get("/api/readiness", async (req, res, next) => {
@@ -88,6 +97,11 @@ app.delete("/api/pages/:pageId", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerDeletePage(req, res)).catch(next);
 });
 
+
+// sketches
+app.post("/api/sketches", authMiddleware, fileUploadMiddleware.single("sketch"), async (req, res, next) => {
+    Promise.resolve(await handlerCreateSketch(req, res)).catch(next);
+});
 
 
 // users
