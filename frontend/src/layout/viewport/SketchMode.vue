@@ -5,9 +5,9 @@
     import { printError } from '@/lib/errorHandler';
     import { apiErrorHandler } from '@/lib/errorHandler';
 
-    const pointSize = ref(10);
-    var isPointSize
+    const sketchContainer = useTemplateRef<HTMLElement | undefined>('sketch');
 
+    const pointSize = ref(10);
     const currentPointSize = computed(() => {
         if (pointSize.value === 10) {
             return "small";
@@ -18,66 +18,8 @@
         }
     });
 
-
-    var currentSketch: p5;
-    var p5Canvas: p5.Renderer;
-
-    const sketchContainer = useTemplateRef<HTMLElement | undefined>('sketch');
-
-    const s = (sketch: p5) => {
-        sketch.setup = () => {
-            p5Canvas = sketch.createCanvas(250, 400);
-            sketch.background(255);
-        };
-
-        sketch.draw = () => {
-            sketch.fill(0);
-            sketch.noStroke();
-            if (sketch.mouseIsPressed) {
-                sketch.circle(sketch.mouseX, sketch.mouseY, pointSize.value);
-            }
-        };
-    }
-
-    async function submit() {
-        p5Canvas.elt.toBlob(async (blob) => {
-            const formData = new FormData();
-            try {
-                if (!blob) {
-                    throw new Error;
-                }
-
-                formData.append("sketch", blob, "sketch.png");
-
-                const url = `${serverURL}/api/sketches`;
-                const response = await fetch(url, {
-                    method: "POST",
-                    mode: "cors",
-                    body: formData,
-                    headers: {
-                        "Authorization": `Bearer ${sessionStorage.accessToken}`,
-                    }
-                });
-
-                if (!response.ok) {
-                    apiErrorHandler(response);
-                    throw new Error;
-                }
-
-            } catch (err) {
-                printError(err);
-            }
-        });
-
-        if (sketchContainer.value){
-            currentSketch.setup();
-            currentSketch.draw();
-        }
-    }
-    
     function changePointSize(event: Event) {
         const element = event.target;
-
         if (element instanceof HTMLElement) {
             if (element.id === "smallPoint") {
                 pointSize.value = 10;
@@ -92,11 +34,71 @@
         }
     }
 
-    onMounted(() => {
-        if (sketchContainer.value){
-            currentSketch = new p5(s, sketchContainer.value);
-        }
+    var sketch: p5;
+    var sketchCanvas: p5.Renderer;
 
+    const sketchConfig = (p: p5) => {
+        p.setup = () => {
+            sketchCanvas = p.createCanvas(250, 400);
+            sketch.background(255);
+        };
+
+        p.draw = () => {
+            p.fill(0);
+            p.noStroke();
+            if (p.mouseIsPressed) {
+                p.circle(p.mouseX, p.mouseY, pointSize.value);
+            }
+        };
+    }
+
+    async function saveSketch(blob: Blob | null) {
+        try {
+            if (blob === null) {
+                throw new Error;
+            }
+            
+            const formData = new FormData();
+
+            const sketchKey = new Uint32Array(1);
+            crypto.getRandomValues(sketchKey);
+
+            formData.append(
+                "sketch", 
+                blob, 
+                `sketch-${sketchKey}/${sessionStorage.userId}.png`
+            );
+
+            const url = `${serverURL}/api/sketches`;
+            const response = await fetch(url, {
+                method: "POST",
+                mode: "cors",
+                body: formData,
+                headers: {
+                    "Authorization": `Bearer ${sessionStorage.accessToken}`,
+                }
+            });
+
+            if (!response.ok) {
+                apiErrorHandler(response);
+                throw new Error;
+            }
+
+        } catch (err) {
+            printError(err);
+        }
+    }
+    
+    async function submitSketch() {
+        sketchCanvas.elt.toBlob(saveSketch, "image/png");
+        sketch.setup();
+        sketch.draw();
+    }
+
+    onMounted(() => {
+        if (sketchContainer.value) {
+            sketch = new p5(sketchConfig, sketchContainer.value);
+        }
     });
 </script>
 
@@ -126,7 +128,7 @@
         </div>
         <div class="sketchContainer">
             <div ref="sketch" class="sketch" ></div>
-            <button class="mainMenuButton submitSketchButton" @click="submit">Submit</button>
+            <button class="mainMenuButton submitSketchButton" @click="submitSketch">Submit</button>
         </div>
     </div>
 </template>
