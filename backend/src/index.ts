@@ -42,7 +42,7 @@ if (config.mode === "production") {
     app.use("/", express.static(staticPath));
 }
 
-const s3Client = new S3Client({
+export const s3 = new S3Client({
     region: "REGION",
     forcePathStyle: true,
     credentials: {
@@ -52,7 +52,7 @@ const s3Client = new S3Client({
     endpoint: "http://minio-db:9000",
 });
 
-createBucket(s3Client, "sketches");
+createBucket(s3, "sketches");
 
 const fileUploadMiddleware = multer({
     storage: multer.memoryStorage(),

@@ -66,7 +66,7 @@
             formData.append(
                 "sketch", 
                 blob, 
-                `sketch-${sketchKey}/${sessionStorage.userId}.png`
+                `sk-${sketchKey}-${sessionStorage.userId}.png`
             );
 
             const url = `${serverURL}/api/sketches`;
