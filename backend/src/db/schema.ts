@@ -31,7 +31,7 @@ export const sketches = pgTable("sketches", {
     isChild: boolean("is_child").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
-    sketchURL: text("sketch_url").notNull().unique(),
+    sketchKey: text("sketch_key").notNull().unique(),
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" })
 });
 
@@ -69,6 +69,7 @@ export const refreshTokens = pgTable("refresh_tokens", {
 export type UserRecord = typeof users.$inferInsert;
 export type PageRecord = typeof pages.$inferInsert;
 export type NotebookRecord = typeof notebooks.$inferInsert;
+export type SketchRecord = typeof sketches.$inferInsert;
 export type PagesToNotebooksRecord = typeof pagesToNotebooks.$inferInsert;
 export type NotebooksToNotebooksRecord = typeof notebooksToNotebooks.$inferInsert;
 export type RefreshTokenRecord = typeof refreshTokens.$inferInsert;
