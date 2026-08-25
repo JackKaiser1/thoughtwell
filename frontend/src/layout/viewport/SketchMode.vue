@@ -84,6 +84,8 @@
                 throw new Error;
             }
 
+            console.log(await response.json());
+
         } catch (err) {
             printError(err);
         }

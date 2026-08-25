@@ -36,6 +36,15 @@ export type NotebookResponse = {
     updatedAt: Date;
 }
 
+export type SketchResponse = {
+    sketchKey: string;
+    userId: string;
+    id: string;
+    isChild: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 export type NotebookContentResponse = {
     pages: PageResponse[],
     notebooks: NotebookResponse[],
