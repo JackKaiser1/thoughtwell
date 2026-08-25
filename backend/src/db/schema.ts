@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, timestamp, boolean, uniqueIndex } from "drizzle-orm/pg-core"; 
+import { pgTable, uuid, varchar, timestamp, boolean, uniqueIndex, text } from "drizzle-orm/pg-core"; 
 
 export const users = pgTable("users", {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -23,6 +23,15 @@ export const notebooks = pgTable("notebooks", {
     isChild: boolean("is_child").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" })
+});
+
+export const sketches = pgTable("sketches", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    isChild: boolean("is_child").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+    sketchURL: text("sketch_url").notNull().unique(),
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" })
 });
 
