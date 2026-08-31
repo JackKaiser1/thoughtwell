@@ -38,3 +38,12 @@ export async function deleteSketch(client: dbClient, sketchId: string) {
         .delete(sketches)
         .where(eq(sketches.id, sketchId));
 }
+
+export async function makeChildSketch(client: dbClient, sketchId: string) {
+    const [sketchRecord] = await client 
+                                .update(sketches)
+                                .set({ isChild: true })
+                                .where(eq(sketches.id, sketchId))
+                                .returning();
+    return sketchRecord;
+}
