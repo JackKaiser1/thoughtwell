@@ -4,7 +4,7 @@ import { s3 } from "../index.js";
 import { config } from "../config.js";
 import { BadRequestError, ForbiddenError } from "./errors.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
-import { createSketch, SketchQuery } from "../db/queries/sketches.js";
+import { type SketchMetadataQuery, createSketch } from "../db/queries/sketches.js";
 import { db } from "../db/index.js";
 
 export async function handlerCreateSketch(req: Request, res: Response) {
@@ -25,15 +25,15 @@ export async function handlerCreateSketch(req: Request, res: Response) {
     const response = await s3.send(command);
     console.log(response);
 
-    const sketchQuery: SketchQuery = {
+    const sketchMetadataQuery: SketchMetadataQuery = {
         userId: userId,
         sketchKey: sketchKey,
     }
 
-    const sketchRecord = await createSketch(db, sketchQuery);
-    if (!sketchRecord) {
+    const sketchMetadataRecord = await createSketch(db, sketchMetadataQuery);
+    if (!sketchMetadataRecord) {
         throw new Error("Failed to create sketch record");
     }
 
-    res.json(sketchRecord).status(201);
+    res.json(sketchMetadataRecord).status(201);
 }

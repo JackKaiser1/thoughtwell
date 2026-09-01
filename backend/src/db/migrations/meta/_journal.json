@@ -71,6 +71,13 @@
       "when": 1787681437442,
       "tag": "0009_giant_jubilee",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788287997400,
+      "tag": "0010_kind_reaper",
+      "breakpoints": true
     }
   ]
 }

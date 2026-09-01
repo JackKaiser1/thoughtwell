@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { rollbackErrorHandler } from "../../lib/query-helpers.js";
 import { db } from "../../db/index.js";
-import { type SketchQuery, createSketch, getSketch, getLooseSketches, deleteSketch, makeChildSketch } from "../../db/queries/sketches.js"
+import { type SketchMetadataQuery, createSketch, getSketch, getLooseSketches, deleteSketch, makeChildSketch } from "../../db/queries/sketches.js"
 import { createUser } from "../../db/queries/users.js";
 
 describe("createSketch", () => {
@@ -12,11 +12,11 @@ describe("createSketch", () => {
                 const userRecord = await createUser(tx, user);
                 const userId = userRecord.id;
 
-                const sketchQuery: SketchQuery = { sketchKey: "key", userId: userId };
-                const sketchRecord = await createSketch(tx, sketchQuery);
+                const sketchMetadataQuery: SketchMetadataQuery = { sketchKey: "key", userId: userId };
+                const sketchMetadataRecord = await createSketch(tx, sketchMetadataQuery);
                 
-                expect(sketchRecord).toBeTruthy();
-                expect(sketchRecord.userId).toBe(userId);
+                expect(sketchMetadataRecord).toBeTruthy();
+                expect(sketchMetadataRecord.userId).toBe(userId);
 
                 tx.rollback();
             })
@@ -34,15 +34,15 @@ describe("getSketch", () => {
                 const userRecord = await createUser(tx, user);
                 const userId = userRecord.id;
 
-                const sketchQuery: SketchQuery = { sketchKey: "key", userId: userId };
-                const sketchRecord = await createSketch(tx, sketchQuery);
-                const sketchId = sketchRecord.id;
+                const sketchMetadataQuery: SketchMetadataQuery = { sketchKey: "key", userId: userId };
+                const sketchMetadataRecord = await createSketch(tx, sketchMetadataQuery);
+                const sketchId = sketchMetadataRecord.id;
 
-                const fetchedSketchRecord = await getSketch(tx, sketchId);
+                const fetchedSketchMetadataRecord = await getSketch(tx, sketchId);
 
-                expect(fetchedSketchRecord).toBeTruthy();
-                expect(fetchedSketchRecord.userId).toBe(userId);
-                expect(fetchedSketchRecord.id).toBe(sketchId);
+                expect(fetchedSketchMetadataRecord).toBeTruthy();
+                expect(fetchedSketchMetadataRecord.userId).toBe(userId);
+                expect(fetchedSketchMetadataRecord.id).toBe(sketchId);
 
                 tx.rollback();
             })
@@ -60,24 +60,24 @@ describe("getLooseSketches", () => {
                 const userRecord = await createUser(tx, user);
                 const userId = userRecord.id;
 
-                const sketchQuery1: SketchQuery = { sketchKey: "key1", userId: userId };
-                const sketchRecord1 = await createSketch(tx, sketchQuery1);
+                const sketchMetadataQuery1: SketchMetadataQuery = { sketchKey: "key1", userId: userId };
+                const sketchMetadataRecord1 = await createSketch(tx, sketchMetadataQuery1);
 
-                const sketchQuery2: SketchQuery = { sketchKey: "key2", userId: userId };
-                const sketchRecord2 = await createSketch(tx, sketchQuery2);
+                const sketchMetadataQuery2: SketchMetadataQuery = { sketchKey: "key2", userId: userId };
+                const sketchMetadataRecord2 = await createSketch(tx, sketchMetadataQuery2);
 
-                const sketchQuery3: SketchQuery = { sketchKey: "key3", userId: userId };
-                const sketchRecord3 = await createSketch(tx, sketchQuery3);
-                const childSketchRecord = await makeChildSketch(tx, sketchRecord3.id);
+                const sketchMetadataQuery3: SketchMetadataQuery = { sketchKey: "key3", userId: userId };
+                const sketchMetadataRecord3 = await createSketch(tx, sketchMetadataQuery3);
+                const childSketchMetadataRecord = await makeChildSketch(tx, sketchMetadataRecord3.id);
 
                 const looseSketches = await getLooseSketches(tx, userId);
 
-                for (const sketchRecord of looseSketches) {
-                    expect(sketchRecord.isChild).toBe(false);
+                for (const sketchMetadataRecord of looseSketches) {
+                    expect(sketchMetadataRecord.isChild).toBe(false);
                 }
 
                 expect(looseSketches.length).toBe(2);
-                expect(childSketchRecord.isChild).toBe(true);
+                expect(childSketchMetadataRecord.isChild).toBe(true);
 
                 tx.rollback();
             })
@@ -95,15 +95,15 @@ describe("deleteSketch", () => {
                 const userRecord = await createUser(tx, user);
                 const userId = userRecord.id;
 
-                const sketchQuery: SketchQuery = { sketchKey: "key", userId: userId };
-                const sketchRecord = await createSketch(tx, sketchQuery);
-                const sketchId = sketchRecord.id;
+                const sketchMetadataQuery: SketchMetadataQuery = { sketchKey: "key", userId: userId };
+                const sketchMetadataRecord = await createSketch(tx, sketchMetadataQuery);
+                const sketchId = sketchMetadataRecord.id;
 
                 await deleteSketch(tx, sketchId);
 
-                const deletedSketchRecord = await getSketch(tx, sketchId);
+                const deletedSketchMetadataRecord = await getSketch(tx, sketchId);
 
-                expect(deletedSketchRecord).toBeUndefined();
+                expect(deletedSketchMetadataRecord).toBeUndefined();
 
                 tx.rollback();
             })
