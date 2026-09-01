@@ -83,4 +83,5 @@ export type NotebookRecord = typeof notebooks.$inferInsert;
 export type SketchMetadataRecord = typeof sketchMetadata.$inferInsert;
 export type PagesToNotebooksRecord = typeof pagesToNotebooks.$inferInsert;
 export type NotebooksToNotebooksRecord = typeof notebooksToNotebooks.$inferInsert;
+export type SketchesToNotebooksRecord = typeof sketchesToNotebooks.$inferInsert;
 export type RefreshTokenRecord = typeof refreshTokens.$inferInsert;
