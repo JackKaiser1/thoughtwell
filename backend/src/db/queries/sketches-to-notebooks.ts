@@ -13,6 +13,14 @@ export async function createSketchesToNotebooks(client: dbClient, sketchesToNote
     return sketchesToNotebooksRecord;
 }
 
+export async function getSketchesToNotebooks(client: dbClient, sketchesToNotebooksId: string) {
+    const [sketchesToNotebooksRecord] = await client
+                                                .select()
+                                                .from(sketchesToNotebooks)
+                                                .where(eq(sketchesToNotebooks.id, sketchesToNotebooksId));
+    return sketchesToNotebooksRecord;
+}
+
 export async function deleteSketchesToNotebooks(client: dbClient, sketchId: string) {
     await client   
             .delete(sketchesToNotebooks)
