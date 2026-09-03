@@ -53,3 +53,18 @@ export type NotebookContentResponse = {
 export type AccessTokenResponse = {
     accessToken: string;
 }
+
+export type SketchMetaDataResponse = {
+    presignedURL: string;
+    userId: string;
+    sketchKey: string;
+    id: string;
+    isChild: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export type LooseContentResponse = { 
+    loosePages: PageResponse[], 
+    looseSketches: SketchMetaDataResponse[] 
+};

@@ -1,6 +1,6 @@
 <script setup lang="ts">
     import Page from './viewport/Page.vue';
-    import { useLoosePageStore } from '../stores/loose-pages';
+    import { useLooseContentStore } from '../stores/loose-pages';
     import LoosePagesMode from './viewport/LoosePagesMode.vue';
     import Home from './viewport/Home.vue';
     import { useRoute } from 'vue-router';

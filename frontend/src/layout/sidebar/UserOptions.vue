@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { useLoosePageStore } from '@/stores/loose-pages.js';
+    import { useLooseContentStore } from '@/stores/loose-pages.js';
     import { useSessionStore } from '../../stores/session.js';
     import { useTopLevelNotebooksStore } from '@/stores/top-level-notebooks.js';
     import { useSelectedPageStore } from '@/stores/selected-pages.js';
@@ -22,7 +22,7 @@
 
     function logoutUser() {
         useSessionStore().logoutSession();
-        useLoosePageStore().clearLoosePages();
+        useLooseContentStore().clearLoosePages();
         useTopLevelNotebooksStore().clearTopLevelNotebooks();
         useSelectedPageStore().clearSelectedPages();
         useSelectedNotebookStore().clearSelectedNotebook();
