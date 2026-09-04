@@ -52,6 +52,17 @@ export const s3 = new S3Client({
     endpoint: "http://minio-db:9000",
 });
 
+export const externalS3 = new S3Client({
+    region: "REGION",
+    forcePathStyle: true,
+    credentials: {
+        accessKeyId: config.s3AccessKeyId,
+        secretAccessKey: config.s3SecretAccessKey,
+    },
+    endpoint: "http://localhost:9000",
+});
+
+
 createBucket(s3, "sketches");
 
 const fileUploadMiddleware = multer({
