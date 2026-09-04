@@ -11,7 +11,7 @@
 
 <template>
     <div class="sketchDisplay">
-        <img :src="sketchUrl">
+        <img class="sketchImg" :src="sketchUrl">
     </div>
 </template>
 
@@ -24,14 +24,22 @@
         height: 19.5rem;
         width: 12rem;
         display: flex;
-        justify-content: left;
-        align-items: baseline;
+        justify-content: center;
+        align-items: center;
         padding: 1rem;
         margin: 1rem;
         box-shadow: 3px 3px 5px rgb(11, 11, 11);
-        overflow-y: scroll;
         text-wrap: balance;
         transition: box-shadow 0.18s;
         user-select: none;
+    }
+
+    .sketchDisplay::-webkit-scrollbar {
+        background-color: white;
+    }
+
+    .sketchImg {
+        height: 19.5rem;
+        width: 12rem;
     }
 </style>
