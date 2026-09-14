@@ -5,9 +5,16 @@ import { getNotebook } from "../db/queries/notebooks.js";
 import { type dbClient } from "../db/index.js";
 import { type PageRecord } from "../db/schema.js";
 import { getPage } from "../db/queries/pages.js";
+import { getSketch } from "../db/queries/sketches.js";
 
+type GetQueryFunc = typeof getPage | typeof getNotebook | typeof getSketch;
 
-export async function verifyChildrenToAdd(client: dbClient, childrenToAdd: unknown, authenticatedUserId: string): Promise<ChildrenToAdd> {
+export async function verifyChildrenToAdd(
+    client: dbClient, 
+    childrenToAdd: unknown, 
+    authenticatedUserId: string,
+    getQueryFunc: GetQueryFunc): Promise<ChildrenToAdd> {
+
     if (!isChildrenToAdd(childrenToAdd)) {
         throw new BadRequestError("Payload is invalid type");
     }
@@ -19,7 +26,7 @@ export async function verifyChildrenToAdd(client: dbClient, childrenToAdd: unkno
         verifyUUID(id);
     }
 
-   return await authorizeNotebookEdit(client, childrenToAdd, authenticatedUserId);
+   return await authorizeNotebookEdit(client, childrenToAdd, authenticatedUserId, getQueryFunc);
 }
 
 export function isChildrenToAdd(obj: unknown): obj is ChildrenToAdd {
@@ -31,7 +38,8 @@ export function isChildrenToAdd(obj: unknown): obj is ChildrenToAdd {
     if (typeof (obj as ChildrenToAdd).userId !== "string") return false
     if (typeof (obj as ChildrenToAdd).notebookId !== "string") return false;
     if ((obj as ChildrenToAdd).typeOfChild !== "pages" &&
-        (obj as ChildrenToAdd).typeOfChild !== "notebooks") return false; 
+        (obj as ChildrenToAdd).typeOfChild !== "notebooks" &&
+        (obj as ChildrenToAdd).typeOfChild !== "sketches") return false; 
 
     for (const id of (obj as ChildrenToAdd).childIds) {
         if (id === undefined) return false;
@@ -41,7 +49,12 @@ export function isChildrenToAdd(obj: unknown): obj is ChildrenToAdd {
     return true;
 }
 
-export async function authorizeNotebookEdit(client: dbClient, childrenToAdd: ChildrenToAdd, authenticatedUserId: string) {
+export async function authorizeNotebookEdit(
+    client: dbClient, 
+    childrenToAdd: ChildrenToAdd, 
+    authenticatedUserId: string, 
+    getQuery: GetQueryFunc) {
+
     const {typeOfChild, userId, notebookId, childIds} = childrenToAdd;
 
     const errMessage = "User is not authorized to edit notebook";
@@ -58,12 +71,17 @@ export async function authorizeNotebookEdit(client: dbClient, childrenToAdd: Chi
     const queryPromises = [];
     for (const id of childIds) {
 
-        if (typeOfChild === "pages") {
-            queryPromises.push(getPage(client, id));
-        } 
-        else if (typeOfChild === "notebooks") {
-            queryPromises.push(getNotebook(client, id));
-        }
+        queryPromises.push(getQuery(client, id));
+
+        // if (typeOfChild === "pages") {
+        //     queryPromises.push(getPage(client, id));
+        // } 
+        // else if (typeOfChild === "notebooks") {
+        //     queryPromises.push(getNotebook(client, id));
+        // }
+        // else if (typeOfChild === "sketches") {
+        //     queryPromises.push(getSketch(client, id));
+        // }
 
     }
 
