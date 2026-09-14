@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { type PageQuery, createPage } from "../db/queries/pages.js";
+import { type PageQuery, createPage, getPage } from "../db/queries/pages.js";
 import { getUser, getUserFromUsername } from "../db/queries/users.js";
 import { verifyPageData } from "../lib/verify-page.js";
 import { CharacterLimit } from "./api-constants.js";
@@ -42,7 +42,7 @@ export async function handlerCreatePage(req: Request, res: Response) {
             notebookId: parentNotebookId,
         }
 
-        const verifiedPayload = await verifyChildrenToAdd(db, childrenToAdd, userId);
+        const verifiedPayload = await verifyChildrenToAdd(db, childrenToAdd, userId, getPage);
 
         await addChildrenToNotebook(db, 
                                     verifiedPayload, 

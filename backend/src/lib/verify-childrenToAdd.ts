@@ -70,19 +70,7 @@ export async function authorizeNotebookEdit(
 
     const queryPromises = [];
     for (const id of childIds) {
-
         queryPromises.push(getQuery(client, id));
-
-        // if (typeOfChild === "pages") {
-        //     queryPromises.push(getPage(client, id));
-        // } 
-        // else if (typeOfChild === "notebooks") {
-        //     queryPromises.push(getNotebook(client, id));
-        // }
-        // else if (typeOfChild === "sketches") {
-        //     queryPromises.push(getSketch(client, id));
-        // }
-
     }
 
     const childRecords = await Promise.all(queryPromises);

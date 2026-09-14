@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { NotebookRecord } from "../db/schema.js";
 import { getUser, getUserFromUsername } from "../db/queries/users.js";
-import { createNotebook } from "../db/queries/notebooks.js";
+import { createNotebook, getNotebook } from "../db/queries/notebooks.js";
 import { BadRequestError, NotFoundError } from "./errors.js";
 import { db } from "../db/index.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
@@ -40,7 +40,7 @@ export async function handlerCreateNotebook(req: Request, res: Response) {
             notebookId: parentNotebookId,
         }
 
-        const verifiedPayload = await verifyChildrenToAdd(db, childrenToAdd, userId);
+        const verifiedPayload = await verifyChildrenToAdd(db, childrenToAdd, userId, getNotebook);
 
         await addChildrenToNotebook(db, 
                                     verifiedPayload, 
