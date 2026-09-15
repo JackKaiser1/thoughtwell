@@ -13,14 +13,14 @@ export const useCurrentNotebookStore = defineStore("currentNotebook", () => {
 
     const currentNotebook: Ref<VisitedNotebook | undefined> = ref(visitedNotebooksArray.value[-1]);
 
-    const currentNotebookContent: Ref<NotebookContentResponse> = ref({ pages: [], notebooks: [] });
+    const currentNotebookContent: Ref<NotebookContentResponse> = ref({ pages: [], notebooks: [], sketches: [] });
 
     function setCurrentNotebook(notebook: VisitedNotebook) {
         currentNotebook.value = notebook;
     }
 
     function openNotebook(content: NotebookContentResponse, notebook: VisitedNotebook) {
-        currentNotebookContent.value = { pages: [], notebooks: [] };
+        currentNotebookContent.value = { pages: [], notebooks: [], sketches: [] };
 
         vistNotebook(notebook);
         setCurrentNotebook(notebook);
@@ -48,7 +48,7 @@ export const useCurrentNotebookStore = defineStore("currentNotebook", () => {
     function clearCurrentNotebook() {
         visitedNotebooksArray.value = [];
         currentNotebook.value = undefined;
-        currentNotebookContent.value = { pages: [], notebooks: [] };
+        currentNotebookContent.value = { pages: [], notebooks: [], sketches: [] };
     }
 
     async function refreshContent() {

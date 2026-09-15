@@ -4,6 +4,7 @@
     import { serverURL } from '@/constants';
     import { printError } from '@/lib/errorHandler';
     import { apiErrorHandler } from '@/lib/errorHandler';
+import { useCurrentNotebookStore } from '@/stores/current-notebook';
 
     const sketchContainer = useTemplateRef<HTMLElement | undefined>('sketch');
 
@@ -58,6 +59,8 @@
                 throw new Error;
             }
             
+            const parentNotebookId = useCurrentNotebookStore().currentNotebook?.notebookId;
+
             const formData = new FormData();
 
             const sketchKey = new Uint32Array(1);
@@ -68,6 +71,8 @@
                 blob, 
                 `sk-${sketchKey}-${sessionStorage.userId}.png`
             );
+
+            formData.append("parentNotebookId", parentNotebookId ? parentNotebookId : "");
 
             const url = `${serverURL}/api/sketches`;
             const response = await fetch(url, {

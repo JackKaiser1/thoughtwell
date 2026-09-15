@@ -4,8 +4,11 @@ import { s3 } from "../index.js";
 import { config } from "../config.js";
 import { BadRequestError, ForbiddenError } from "./errors.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
-import { type SketchMetadataQuery, createSketch } from "../db/queries/sketches.js";
+import { type SketchMetadataQuery, createSketch, getSketch, makeChildSketch } from "../db/queries/sketches.js";
 import { db } from "../db/index.js";
+import { verifyChildrenToAdd } from "../lib/verify-childrenToAdd.js";
+import { type ChildrenToAdd, addChildrenToNotebook } from "../lib/add-children.js";
+import { createSketchesToNotebooks, deleteSketchesToNotebooks } from "../db/queries/sketches-to-notebooks.js";
 
 export async function handlerCreateSketch(req: Request, res: Response) {
     if (!req.file) {
@@ -14,6 +17,10 @@ export async function handlerCreateSketch(req: Request, res: Response) {
 
     const userId = verifyUUID(res.locals.userId);
     const sketchKey = req.file.originalname;
+
+    const parentNotebookId = req.body.parentNotebookId;
+
+    
 
     const command = new PutObjectCommand({
         Bucket: "sketches",
@@ -34,6 +41,22 @@ export async function handlerCreateSketch(req: Request, res: Response) {
     if (!sketchMetadataRecord) {
         throw new Error("Failed to create sketch record");
     }
+
+    if (parentNotebookId) {
+        console.log(`--- ${parentNotebookId} ---`);
+
+        const childrenToAdd: ChildrenToAdd = {
+            typeOfChild: "sketches",
+            userId: userId,
+            childIds: [sketchMetadataRecord.id],
+            notebookId: parentNotebookId,
+        }
+
+        const verifiedPayload = await verifyChildrenToAdd(db, childrenToAdd, userId, getSketch);
+
+        await addChildrenToNotebook(db, verifiedPayload, deleteSketchesToNotebooks, createSketchesToNotebooks, makeChildSketch);
+    }
+
 
     res.json(sketchMetadataRecord).status(201);
 }

@@ -48,6 +48,7 @@ export type SketchResponse = {
 export type NotebookContentResponse = {
     pages: PageResponse[],
     notebooks: NotebookResponse[],
+    sketches: SketchMetaDataResponse[]
 }
 
 export type AccessTokenResponse = {
