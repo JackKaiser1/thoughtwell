@@ -27,6 +27,7 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { createBucket } from "./lib/create-bucket.js"
 import { handlerCreateSketch } from "./api/create-sketch.js";
 import multer from "multer";
+import { handlerAddSketchesToNotebook } from "./api/add-sketches-notebooks.js";
 
 export const app = express();
 const PORT = 8080;
@@ -158,6 +159,10 @@ app.get("/api/notebooks/all", apiKeyAuthMiddleware, async (req, res, next) => {
 
 app.post("/api/notebooks/addPages", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerAddPagesToNotebook(req, res)).catch(next);
+});
+
+app.post("/api/notebooks/addSketches", authMiddleware, async (req, res, next) => {
+    Promise.resolve(await handlerAddSketchesToNotebook(req, res).catch(next));
 });
 
 app.get("/api/notebooks/:notebookId/pages", authMiddleware, async (req, res, next) => {
