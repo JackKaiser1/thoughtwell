@@ -8,6 +8,7 @@
     import { serverURL } from '@/constants.js';
     import { apiErrorHandler, printError } from '@/lib/errorHandler.js';
     import { useCurrentNotebookStore } from '@/stores/current-notebook.js';
+    import { useSelectedSketchStore } from '@/stores/selected-sketches.js';
 
     const username: string = sessionStorage.userName;
     const isClicked = ref(false);
@@ -27,6 +28,7 @@
         useSelectedPageStore().clearSelectedPages();
         useSelectedNotebookStore().clearSelectedNotebook();
         useCurrentNotebookStore().clearCurrentNotebook();
+        useSelectedSketchStore().clearSelectedSketches();
     }
 
     async function deleteUser() {

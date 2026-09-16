@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useSelectedSketchStore } from '@/stores/selected-sketches';
+import { computed } from 'vue';
+
     const props = defineProps({
         sketchId: String,
         sketchUrl: String,
@@ -7,10 +10,22 @@
     const sketchUrl = props.sketchUrl;
     const sketchId = props.sketchId;
 
+    function select() {
+        if (!sketchId) return;
+        useSelectedSketchStore().selectSketch(sketchId);
+    }
+
+    const isSketchSelected = computed(() => {
+        if (!sketchId) return;
+        return useSelectedSketchStore().selectedSketches.has(sketchId);
+    });
+
 </script>
 
 <template>
-    <div class="sketchDisplay">
+    <div class="sketchDisplay"
+        :style="isSketchSelected ? { boxShadow: '3px 3px 15px 1px rgb(89, 90, 150)'} : { border: 'none' } "
+        @click="select">
         <img class="sketchImg" :src="sketchUrl">
     </div>
 </template>
