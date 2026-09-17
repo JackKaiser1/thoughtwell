@@ -28,6 +28,7 @@ import { createBucket } from "./lib/create-bucket.js"
 import { handlerCreateSketch } from "./api/create-sketch.js";
 import multer from "multer";
 import { handlerAddSketchesToNotebook } from "./api/add-sketches-notebooks.js";
+import { handlerDeleteSketch } from "./api/delete-sketch.js";
 
 export const app = express();
 const PORT = 8080;
@@ -113,6 +114,10 @@ app.delete("/api/pages/:pageId", authMiddleware, async (req, res, next) => {
 // sketches
 app.post("/api/sketches", authMiddleware, fileUploadMiddleware.single("sketch"), async (req, res, next) => {
     Promise.resolve(await handlerCreateSketch(req, res)).catch(next);
+});
+
+app.delete("/api/sketches/:sketchId", authMiddleware, async (req, res, next) => {
+    Promise.resolve(await handlerDeleteSketch(req, res)).catch(next);
 });
 
 
