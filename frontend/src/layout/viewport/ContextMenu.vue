@@ -8,6 +8,7 @@
 import ClearNotebookSelectionButton from './context-menu/ClearNotebookSelectionButton.vue';
 import ClearSketchSelection from './context-menu/ClearSketchSelection.vue';
 import AddSketchesToNotebook from './context-menu/AddSketchesToNotebook.vue';
+import DeleteSketchButton from './context-menu/DeleteSketchButton.vue';
 
     const menuX = ref(0);
     const menuY = ref(0);
@@ -53,6 +54,8 @@ import AddSketchesToNotebook from './context-menu/AddSketchesToNotebook.vue';
         <ClearNotebookSelectionButton />
         <br>
         <DeletePageButton />
+        <br>
+        <DeleteSketchButton />
         <br>
         <DeleteNotebookButton />
     </div>
