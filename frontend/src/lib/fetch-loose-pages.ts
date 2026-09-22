@@ -1,7 +1,7 @@
 import { apiErrorHandler, printError } from '@/lib/errorHandler.js';
 import { loosePagesRoute, serverURL } from '@/constants.js';
-import { type PageResponse } from "@/types/response.js";
-import { useLoosePageStore } from '@/stores/loose-pages.js';
+import { type LooseContentResponse } from "@/types/response.js";
+import { useLooseContentStore } from '@/stores/loose-pages.js';
 import { useRoute } from 'vue-router';
 
 export async function fetchLoosePages() {
@@ -21,9 +21,14 @@ export async function fetchLoosePages() {
             throw new Error;
         }
 
-        const result: PageResponse[] = await response.json();
+        const result: LooseContentResponse = await response.json();
 
-        useLoosePageStore().loosePages = result;
+        console.log(result.loosePages);
+
+        useLooseContentStore().loosePages = result.loosePages;
+        useLooseContentStore().looseSketches = result.looseSketches;
+
+        // console.log(useLooseContentStore().loosePages);
 
     } catch (err) {
         printError

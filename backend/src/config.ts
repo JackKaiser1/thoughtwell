@@ -19,6 +19,13 @@ if (!process.env.MODE) {
     throw new Error("Mode string not found");
 }
 
+if (!process.env.MINIO_ROOT_USER) {
+    throw new Error("Minio username string not found");
+}
+
+if (!process.env.MINIO_ROOT_PASSWORD) {
+    throw new Error("Minio password string not found");
+}
 
 type Config = {
     migrationConfig: MigrationConfig;
@@ -26,6 +33,8 @@ type Config = {
     secret: string;
     apiKey: string;
     mode: string;
+    s3AccessKeyId: string;
+    s3SecretAccessKey: string;
 }
 
 export const config: Config = {
@@ -36,4 +45,6 @@ export const config: Config = {
     secret: process.env.SECRET,
     apiKey: process.env.API_KEY,
     mode: process.env.MODE,
+    s3AccessKeyId: process.env.MINIO_ROOT_USER,
+    s3SecretAccessKey: process.env.MINIO_ROOT_PASSWORD
 }

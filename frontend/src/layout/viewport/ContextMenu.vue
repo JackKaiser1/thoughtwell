@@ -6,6 +6,9 @@
     import DeletePageButton from './context-menu/DeletePageButton.vue';
     import DeleteNotebookButton from './context-menu/DeleteNotebookButton.vue';
 import ClearNotebookSelectionButton from './context-menu/ClearNotebookSelectionButton.vue';
+import ClearSketchSelection from './context-menu/ClearSketchSelection.vue';
+import AddSketchesToNotebook from './context-menu/AddSketchesToNotebook.vue';
+import DeleteSketchButton from './context-menu/DeleteSketchButton.vue';
 
     const menuX = ref(0);
     const menuY = ref(0);
@@ -13,6 +16,7 @@ import ClearNotebookSelectionButton from './context-menu/ClearNotebookSelectionB
 
     const newNotebook = useTemplateRef("newNotebook");
     const addPagesToNotebook = useTemplateRef("addPagestoNotebook");
+    const addSketchesToNotebook = useTemplateRef("addSketchesToNotebook");
 
     function showMenu(event: MouseEvent) {
         isShone.value = !isShone.value;
@@ -23,6 +27,7 @@ import ClearNotebookSelectionButton from './context-menu/ClearNotebookSelectionB
     function closeMenu() {
         newNotebook.value?.unClicked();
         addPagesToNotebook.value?.unClicked();
+        addSketchesToNotebook.value?.unClicked();
     }
 
     defineExpose({
@@ -40,11 +45,17 @@ import ClearNotebookSelectionButton from './context-menu/ClearNotebookSelectionB
         <br>
         <AddPagesToNotebook ref="addPagestoNotebook"/>
         <br>
+        <AddSketchesToNotebook ref="addSketchesToNotebook"/>
+        <br>
         <ClearPageSelection />
+        <br>
+        <ClearSketchSelection />
         <br>
         <ClearNotebookSelectionButton />
         <br>
         <DeletePageButton />
+        <br>
+        <DeleteSketchButton />
         <br>
         <DeleteNotebookButton />
     </div>

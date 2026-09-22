@@ -3,6 +3,7 @@
     import Notebook from './Notebook.vue';
     import Page from './Page.vue';
     import { useCurrentNotebookStore } from '@/stores/current-notebook';
+    import SketchComponent from './SketchComponent.vue';
 
      
 </script>
@@ -18,6 +19,11 @@
                 :page-content="page.pageContent"
                 :page-id="page.id"
                 :key="page.id"/>
+
+    <SketchComponent v-for="sketch in useCurrentNotebookStore().currentNotebookContent.sketches"
+                :sketch-id="sketch.id"
+                :sketch-url="sketch.presignedURL"
+                :key="sketch.id"/>
 </template>
 
 <style></style>

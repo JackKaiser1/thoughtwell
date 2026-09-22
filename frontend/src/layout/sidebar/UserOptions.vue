@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { useLoosePageStore } from '@/stores/loose-pages.js';
+    import { useLooseContentStore } from '@/stores/loose-pages.js';
     import { useSessionStore } from '../../stores/session.js';
     import { useTopLevelNotebooksStore } from '@/stores/top-level-notebooks.js';
     import { useSelectedPageStore } from '@/stores/selected-pages.js';
@@ -8,6 +8,7 @@
     import { serverURL } from '@/constants.js';
     import { apiErrorHandler, printError } from '@/lib/errorHandler.js';
     import { useCurrentNotebookStore } from '@/stores/current-notebook.js';
+    import { useSelectedSketchStore } from '@/stores/selected-sketches.js';
 
     const username: string = sessionStorage.userName;
     const isClicked = ref(false);
@@ -22,11 +23,12 @@
 
     function logoutUser() {
         useSessionStore().logoutSession();
-        useLoosePageStore().clearLoosePages();
+        useLooseContentStore().clearLoosePages();
         useTopLevelNotebooksStore().clearTopLevelNotebooks();
         useSelectedPageStore().clearSelectedPages();
         useSelectedNotebookStore().clearSelectedNotebook();
         useCurrentNotebookStore().clearCurrentNotebook();
+        useSelectedSketchStore().clearSelectedSketches();
     }
 
     async function deleteUser() {

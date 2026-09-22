@@ -3,7 +3,9 @@ import { verifyUUID } from "./verify-uuid.js";
 import { type PagesToNotebooksRecord, 
          type NotebooksToNotebooksRecord,  
          type PageRecord,
-         type NotebookRecord} from "../db/schema.js";
+         type NotebookRecord,
+         type SketchesToNotebooksRecord,
+         type SketchMetadataRecord} from "../db/schema.js";
 import { type dbClient, db } from "../db/index.js";
 import { NotebooksToNotebooksQuery } from "../db/queries/notebooks-to-notebooks.js";
 import { PagesToNotebooksQuery } from "../db/queries/pages-to-notebooks.js";
@@ -11,41 +13,59 @@ import { createNotebooksToNotebooks, deleteNotebooksToNotebooks} from "../db/que
 import { createPagesToNotebooks, deletePagesToNotebooks } from "../db/queries/pages-to-notebooks.js";
 import { makeChildPage } from "../db/queries/pages.js";
 import { makeChildNotebook } from "../db/queries/notebooks.js";
+import { createSketchesToNotebooks, deleteSketchesToNotebooks, SketchesToNotebooksQuery } from "../db/queries/sketches-to-notebooks.js";
+import { makeChildSketch } from "../db/queries/sketches.js";
 
 export type ChildrenToAdd = {
-    typeOfChild: "pages" | "notebooks",
+    typeOfChild: "pages" | "notebooks" | "sketches",
     childIds: string[];
     notebookId: string;
     userId: string;
 }
 
 
-type AddChildrenQueryFunc = typeof createPagesToNotebooks | typeof createNotebooksToNotebooks;
+type AddChildrenQueryFunc = typeof createPagesToNotebooks | typeof createNotebooksToNotebooks | typeof createSketchesToNotebooks;
 
-type makeChildQueryFunc = typeof makeChildPage | typeof makeChildNotebook;
+type makeChildQueryFunc = typeof makeChildPage | typeof makeChildNotebook | typeof makeChildSketch;
 
-type DeleteQuery = typeof deletePagesToNotebooks | typeof deleteNotebooksToNotebooks;
-
-
-export async function addChildrenToNotebook(client: dbClient, 
-                               payload: ChildrenToAdd,
-                               deleteQueryFunc: DeleteQuery,
-                               addChildrenQueryFunc: typeof createPagesToNotebooks,
-                               makeChildrenQueryFunc: typeof makeChildPage): Promise<PagesToNotebooksRecord[]>;
-
-export async function addChildrenToNotebook(client: dbClient, 
-                               payload: ChildrenToAdd,
-                               deleteQueryFunc: DeleteQuery,
-                               addChildrenQueryFunc: typeof createNotebooksToNotebooks,
-                               makeChildrenQueryFunc: typeof makeChildNotebook): Promise<NotebooksToNotebooksRecord[]>;
+type DeleteQuery = typeof deletePagesToNotebooks | typeof deleteNotebooksToNotebooks | typeof deleteSketchesToNotebooks;
 
 
+// Add page to notebook
+export async function addChildrenToNotebook(
+    client: dbClient, 
+    payload: ChildrenToAdd,
+    deleteQueryFunc: DeleteQuery,
+    addChildrenQueryFunc: typeof createPagesToNotebooks,
+    makeChildrenQueryFunc: typeof makeChildPage
+): Promise<PagesToNotebooksRecord[]>;
 
-export async function addChildrenToNotebook(client: dbClient, 
-                                            payload: ChildrenToAdd, 
-                                            deleteQueryFunc: DeleteQuery,
-                                            addChildrenQueryFunc: AddChildrenQueryFunc,
-                                            makeChildrenQueryFunc: makeChildQueryFunc) {
+// Add notebook to notebook
+export async function addChildrenToNotebook(
+    client: dbClient, 
+    payload: ChildrenToAdd,
+    deleteQueryFunc: DeleteQuery,
+    addChildrenQueryFunc: typeof createNotebooksToNotebooks,
+    makeChildrenQueryFunc: typeof makeChildNotebook
+): Promise<NotebooksToNotebooksRecord[]>;
+
+// Add sketch to notebook
+export async function addChildrenToNotebook(
+    client: dbClient, 
+    payload: ChildrenToAdd,
+    deleteQueryFunc: DeleteQuery,
+    addChildrenQueryFunc: typeof createSketchesToNotebooks,
+    makeChildrenQueryFunc: typeof makeChildSketch
+): Promise<SketchesToNotebooksRecord[]>;
+
+
+
+export async function addChildrenToNotebook(
+    client: dbClient, 
+    payload: ChildrenToAdd, 
+    deleteQueryFunc: DeleteQuery,
+    addChildrenQueryFunc: AddChildrenQueryFunc,
+    makeChildrenQueryFunc: makeChildQueryFunc) {
                                                 
     await removePriorRelationships(client, deleteQueryFunc, payload);
     const childParentRecords = await addChildrenQuery(client, payload, addChildrenQueryFunc);
@@ -54,7 +74,7 @@ export async function addChildrenToNotebook(client: dbClient,
     return childParentRecords
 }
 
-
+// Removes any previous child to parent relationship
 export async function removePriorRelationships(client: dbClient, deleteQuery: DeleteQuery, childrenToAdd: ChildrenToAdd) {
     const queryPromises: Promise<void>[] = [];
 
@@ -66,12 +86,16 @@ export async function removePriorRelationships(client: dbClient, deleteQuery: De
     Promise.all(queryPromises);
 }
 
-
-export async function addChildrenQuery(client: dbClient, childrenToAdd: ChildrenToAdd, queryFunc: any) {
-    const queryPromises: Promise<PagesToNotebooksRecord | NotebooksToNotebooksRecord>[] = [];
+// Links child and parent  
+export async function addChildrenQuery(client: dbClient, childrenToAdd: ChildrenToAdd, addChildrenQueryFunc: any) {
+    const queryPromises: Promise<PagesToNotebooksRecord 
+                                | NotebooksToNotebooksRecord
+                                | SketchesToNotebooksRecord>[] = [];
 
     for (const id of childrenToAdd.childIds) {
-        let childParentQuery: PagesToNotebooksQuery | NotebooksToNotebooksQuery;
+        let childParentQuery: PagesToNotebooksQuery 
+                            | NotebooksToNotebooksQuery
+                            | SketchesToNotebooksQuery;
 
         if (childrenToAdd.typeOfChild === "pages") {
             childParentQuery = {
@@ -85,15 +109,24 @@ export async function addChildrenQuery(client: dbClient, childrenToAdd: Children
                     parentNotebookId: childrenToAdd.notebookId,
                     childNotebookId: id,
             }
+        } else if (childrenToAdd.typeOfChild === "sketches") {
+            childParentQuery = {
+                    userId: childrenToAdd.userId,
+                    parentNotebookId: childrenToAdd.notebookId,
+                    childSketchId: id,
+            }
         } else {
             throw new BadRequestError("Payload invalid");
         }
 
-        if ("childPageId" in childParentQuery) {
-            queryPromises.push(queryFunc(client, childParentQuery));
-        } else if ("childNotebookId" in childParentQuery) {
-            queryPromises.push(queryFunc(client, childParentQuery));
-        }
+        queryPromises.push(addChildrenQueryFunc(client, childParentQuery));
+        // if ("childPageId" in childParentQuery) {
+        //     queryPromises.push(addChildrenQueryFunc(client, childParentQuery));
+        // } else if ("childNotebookId" in childParentQuery) {
+        //     queryPromises.push(addChildrenQueryFunc(client, childParentQuery));
+        // } else if ("childSketchId" in childParentQuery) {
+        //     queryPromises.push(addChildrenQueryFunc(client, childParentQuery));
+        // }
 
     }
 
@@ -110,6 +143,14 @@ export async function addChildrenQuery(client: dbClient, childrenToAdd: Children
     else if (childrenToAdd.typeOfChild === "notebooks") {
         for (const record of childParentRecords) {
             if (!isNotebooksToNotebooksRecord(record)) {
+                throw new BadRequestError("payload improperly typed");
+            }
+        }
+    }
+
+    else if (childrenToAdd.typeOfChild === "sketches") {
+        for (const record of childParentRecords) {
+            if (!isSketchesToNotebooksRecord(record)) {
                 throw new BadRequestError("payload improperly typed");
             }
         }
@@ -145,14 +186,28 @@ export function isNotebooksToNotebooksRecord(obj: unknown): obj is NotebooksToNo
     return true;
 }
 
+export function isSketchesToNotebooksRecord(obj: unknown): obj is SketchesToNotebooksRecord {
+    if ((obj as SketchesToNotebooksRecord).id === undefined 
+        || (obj as SketchesToNotebooksRecord).userId === undefined 
+        || (obj as SketchesToNotebooksRecord).parentNotebookId === undefined 
+        || (obj as SketchesToNotebooksRecord).childSketchId === undefined 
+        || (obj as SketchesToNotebooksRecord).createdAt === undefined 
+        || (obj as SketchesToNotebooksRecord).updatedAt === undefined) {
+            return false;
+        }
+
+    return true;
+}
 
 
-
-export async function makeChildren(client: dbClient, childIds: string[], queryFunc: makeChildQueryFunc) {
-    const queryPromises: Promise<PageRecord | NotebookRecord>[] = [];
+// Mark each record as a child
+export async function makeChildren(client: dbClient, childIds: string[], makeChildQueryFunc: makeChildQueryFunc) {
+    const queryPromises: Promise<PageRecord 
+                                | NotebookRecord
+                                | SketchMetadataRecord>[] = [];
 
     for (const id of childIds) {
-        queryPromises.push(queryFunc(client, id));
+        queryPromises.push(makeChildQueryFunc(client, id));
     }
 
     return await Promise.all(queryPromises);

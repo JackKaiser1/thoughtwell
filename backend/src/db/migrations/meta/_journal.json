@@ -57,6 +57,34 @@
       "when": 1778608506542,
       "tag": "0007_fast_slapstick",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787671897727,
+      "tag": "0008_flaky_the_hood",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1787681437442,
+      "tag": "0009_giant_jubilee",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788287997400,
+      "tag": "0010_kind_reaper",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1788290273005,
+      "tag": "0011_careful_thing",
+      "breakpoints": true
     }
   ]
 }

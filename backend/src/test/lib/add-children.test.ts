@@ -3,21 +3,25 @@ import { type ChildrenToAdd,
         addChildrenQuery,
         isPagesToNotebooksRecord, 
         isNotebooksToNotebooksRecord,
+        isSketchesToNotebooksRecord,
         makeChildren,
         removePriorRelationships} from "../../lib/add-children.js";
 import { describe, it, expect } from "vitest";
 import { rollbackErrorHandler } from "../../lib/query-helpers.js";
 import { db } from "../../db/index.js";
 import { createUser } from "../../db/queries/users.js";
-import { createPage } from "../../db/queries/pages.js";
-import { createNotebook } from "../../db/queries/notebooks.js";
+import { createPage, getPage } from "../../db/queries/pages.js";
+import { createNotebook, getNotebook } from "../../db/queries/notebooks.js";
 import { createPagesToNotebooks, getPageChildren, PagesToNotebooksQuery, deletePagesToNotebooks } from "../../db/queries/pages-to-notebooks.js";
 import { makeChildPage } from "../../db/queries/pages.js";
-import { NotebooksToNotebooksRecord, PagesToNotebooksRecord, PageRecord, NotebookRecord } from "../../db/schema.js";
+import { NotebooksToNotebooksRecord, PagesToNotebooksRecord, PageRecord, NotebookRecord, SketchesToNotebooksRecord } from "../../db/schema.js";
 import { createNotebooksToNotebooks, NotebooksToNotebooksQuery, deleteNotebooksToNotebooks, getChildren } from "../../db/queries/notebooks-to-notebooks.js";
 import { makeChildNotebook } from "../../db/queries/notebooks.js";
 import { BadRequestError } from "../../api/errors.js";
 import { verifyChildrenToAdd, isChildrenToAdd } from "../../lib/verify-childrenToAdd.js";
+import { createSketch, getSketch, makeChildSketch } from "../../db/queries/sketches.js";
+import { type SketchMetadataQuery } from "../../db/queries/sketches.js";
+import { createSketchesToNotebooks, deleteSketchesToNotebooks, SketchesToNotebooksQuery } from "../../db/queries/sketches-to-notebooks.js";
 
 describe("addChildrenToNotebook", () => {
     it("should add 3 pages to notebook", async () => {
@@ -124,6 +128,47 @@ describe("addChildrenToNotebook", () => {
             rollbackErrorHandler(err);
         }
     });
+
+    it("should add 2 sketches to notebook", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;
+
+                const sketchMetadataQuery1: SketchMetadataQuery = { sketchKey: "key1", userId: userId };
+                const sketchMetadataRecord1 = await createSketch(tx, sketchMetadataQuery1);
+
+                const sketchMetadataQuery2: SketchMetadataQuery = { sketchKey: "key2", userId: userId };
+                const sketchMetadataRecord2 = await createSketch(tx, sketchMetadataQuery2);
+
+                const notebook = { notebookName: "New Notebook", userId: userId };
+                const notebookRecord = await createNotebook(tx, notebook);
+                const notebookId = notebookRecord.id;
+
+                const childrenToAdd: ChildrenToAdd = {
+                    typeOfChild: "sketches",
+                    userId: userId,
+                    notebookId: notebookId,
+                    childIds: [sketchMetadataRecord1.id, sketchMetadataRecord2.id],
+                };
+
+                const childParentRecords = await addChildrenToNotebook(tx, childrenToAdd, deleteSketchesToNotebooks, createSketchesToNotebooks, makeChildSketch);
+
+                for (const record of childParentRecords) {
+                    expect(record.userId).toEqual(userRecord.id);
+                    expect(record.parentNotebookId).toEqual(notebookRecord.id);
+                }
+
+                expect(childParentRecords[0].childSketchId).toEqual(sketchMetadataRecord1.id);
+                expect(childParentRecords[1].childSketchId).toEqual(sketchMetadataRecord2.id);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
 });
 
 
@@ -204,6 +249,38 @@ describe("isChildrenToAdd", () => {
             rollbackErrorHandler(err);
         }
     });
+
+    it("should return true for sketch type", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;
+
+                const sketchMetadataQuery: SketchMetadataQuery = { sketchKey: "key", userId: userId };
+                const sketchMetadataRecord = await createSketch(tx, sketchMetadataQuery);
+
+                const notebook = { notebookName: "New Notebook", userId: userId };
+                const notebookRecord = await createNotebook(tx, notebook);
+                const notebookId = notebookRecord.id;
+
+                const obj = {
+                    typeOfChild: "sketches",
+                    userId: userId,
+                    notebookId: notebookId,
+                    childIds: [sketchMetadataRecord.id],
+                };
+
+                const isType = isChildrenToAdd(obj);
+
+                expect(isType).toEqual(true);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
 });
 
 
@@ -235,7 +312,7 @@ describe("addChildrenQuery", () => {
                     childIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
                 };
 
-                const childrenToAdd = await verifyChildrenToAdd(tx, obj, userId);
+                const childrenToAdd = await verifyChildrenToAdd(tx, obj, userId, getPage);
 
                 const pageToNotebooksRecords = await addChildrenQuery(tx, childrenToAdd, createPagesToNotebooks) as PagesToNotebooksRecord[];
 
@@ -274,12 +351,51 @@ describe("addChildrenQuery", () => {
                     childIds: [childNotebookId],
                 };
 
-                const childrenToAdd = await verifyChildrenToAdd(tx, obj, userId);
+                const childrenToAdd = await verifyChildrenToAdd(tx, obj, userId, getNotebook);
 
                 const childParentRecords = await addChildrenQuery(tx, childrenToAdd, createNotebooksToNotebooks) as NotebooksToNotebooksRecord[];
 
                 expect(childParentRecords[0].childNotebookId).toEqual(childNotebookRecord.id);
                 expect(childParentRecords[0].parentNotebookId).toEqual(parentNotebookRecord.id);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+
+    it("should create sketchesToNotebooks records", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;
+
+                const sketchMetadataQuery1: SketchMetadataQuery = { sketchKey: "key1", userId: userId };
+                const sketchMetadataRecord1 = await createSketch(tx, sketchMetadataQuery1);
+
+                const sketchMetadataQuery2: SketchMetadataQuery = { sketchKey: "key2", userId: userId };
+                const sketchMetadataRecord2 = await createSketch(tx, sketchMetadataQuery2);
+
+                const notebook = { notebookName: "New Notebook", userId: userId };
+                const notebookRecord = await createNotebook(tx, notebook);
+                const notebookId = notebookRecord.id;
+
+                const obj = {
+                    typeOfChild: "sketches",
+                    userId: userId,
+                    notebookId: notebookId,
+                    childIds: [sketchMetadataRecord1.id, sketchMetadataRecord2.id],
+                };
+
+                const childrenToAdd = await verifyChildrenToAdd(tx, obj, userId, getSketch);
+
+                const pageToNotebooksRecords = await addChildrenQuery(tx, childrenToAdd, createSketchesToNotebooks) as SketchesToNotebooksRecord[];
+
+                expect(pageToNotebooksRecords[0].childSketchId).toEqual(sketchMetadataRecord1.id);
+                expect(pageToNotebooksRecords[1].childSketchId).toEqual(sketchMetadataRecord2.id);
+
 
                 tx.rollback();
             });
@@ -424,6 +540,74 @@ describe("isNotebooksToNotebooksRecord", () => {
     });
 });
 
+describe("isSketchesToNotebooksRecord", () => {
+    it("should return true for proper type", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;
+
+                const sketchMetadataQuery1: SketchMetadataQuery = { sketchKey: "key1", userId: userId };
+                const sketchMetadataRecord1 = await createSketch(tx, sketchMetadataQuery1);
+
+                const notebook = { notebookName: "New Notebook", userId: userId };
+                const notebookRecord = await createNotebook(tx, notebook);
+                const notebookId = notebookRecord.id;
+
+                const sketchesToNotebooksQuery: SketchesToNotebooksQuery = {
+                    userId: userId,
+                    parentNotebookId: notebookId,
+                    childSketchId: sketchMetadataRecord1.id
+                }
+
+                const sketchesToNotebooksRecord = await createSketchesToNotebooks(tx, sketchesToNotebooksQuery);
+
+                const isType = isSketchesToNotebooksRecord(sketchesToNotebooksRecord);
+
+                expect(isType).toEqual(true);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+
+    it("should return false for improper type", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;
+
+                const sketchMetadataQuery1: SketchMetadataQuery = { sketchKey: "key1", userId: userId };
+                const sketchMetadataRecord1 = await createSketch(tx, sketchMetadataQuery1);
+
+                const notebook = { notebookName: "New Notebook", userId: userId };
+                const notebookRecord = await createNotebook(tx, notebook);
+                const notebookId = notebookRecord.id;
+
+                const sketchesToNotebooksQuery: SketchesToNotebooksQuery = {
+                    userId: userId,
+                    parentNotebookId: notebookId,
+                    childSketchId: sketchMetadataRecord1.id
+                }
+
+                const sketchesToNotebooksRecord = await createSketchesToNotebooks(tx, sketchesToNotebooksQuery);
+
+                const isType = isNotebooksToNotebooksRecord(sketchesToNotebooksRecord);
+
+                expect(isType).toEqual(false);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+});
+
 describe("makeChildren", () => {
     it("should return an array of page records with isChild=true", async () => {
         try {
@@ -473,6 +657,34 @@ describe("makeChildren", () => {
 
                 for (const notebookRecord of updatedNotebookRecords) {
                     expect(notebookRecord.isChild).toEqual(true);
+                }
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+
+    it("should return an array of sketch records with isChild=true", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;
+
+                const sketchMetadataQuery1: SketchMetadataQuery = { sketchKey: "key1", userId: userId };
+                const sketchMetadataRecord1 = await createSketch(tx, sketchMetadataQuery1);
+
+                const sketchMetadataQuery2: SketchMetadataQuery = { sketchKey: "key2", userId: userId };
+                const sketchMetadataRecord2 = await createSketch(tx, sketchMetadataQuery2);
+
+                const sketchIds = [sketchMetadataRecord1.id, sketchMetadataRecord2.id];
+
+                const updateSketchRecords = await makeChildren(tx, sketchIds, makeChildSketch) as NotebookRecord[];
+
+                for (const sketchRecord of updateSketchRecords) {
+                    expect(sketchRecord.isChild).toEqual(true);
                 }
 
                 tx.rollback();
@@ -556,6 +768,56 @@ describe("removePriorRelationships", () => {
                 const notebookChildren = children.notebookChildren;
 
                 expect(notebookChildren.length).toEqual(0);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+
+    it("should remove sketch from notebook", async () => {
+        try {
+            await db.transaction(async (tx) => {
+                const user = { userName: "user1", hashedPassword: "verystronghashedpassword" };
+                const userRecord = await createUser(tx, user);
+                const userId = userRecord.id;
+
+                const sketchMetadataQuery1: SketchMetadataQuery = { sketchKey: "key1", userId: userId };
+                const sketchMetadataRecord1 = await createSketch(tx, sketchMetadataQuery1);
+
+                const parentNotebook = { notebookName: "Parent Notebook", userId: userId };
+                const parentNotebookRecord = await createNotebook(tx, parentNotebook);
+                const parentNotebookId = parentNotebookRecord.id;
+
+                const childrenToAdd: ChildrenToAdd = {
+                    typeOfChild: "sketches",
+                    userId: userId,
+                    notebookId: parentNotebookId,
+                    childIds: [sketchMetadataRecord1.id],
+                };
+
+                await addChildrenToNotebook(tx, childrenToAdd, deleteSketchesToNotebooks, createSketchesToNotebooks, makeChildSketch);
+
+                await removePriorRelationships(tx, deleteSketchesToNotebooks, childrenToAdd);
+
+                const children = await getChildren(tx, parentNotebookId);
+                const notebookChildren = children.sketchChildren;
+
+                expect(notebookChildren.length).toEqual(0);
+
+                tx.rollback();
+            });
+        } catch (err) {
+            rollbackErrorHandler(err);
+        }
+    });
+});
+
+describe("", () => {
+    it("", async () => {
+        try {
+            await db.transaction(async (tx) => {
 
                 tx.rollback();
             });

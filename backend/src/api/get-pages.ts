@@ -4,6 +4,8 @@ import { BadRequestError, NotFoundError, UnauthorizedError } from "./errors.js";
 import { db } from "../db/index.js";
 import { verifyUUID } from "../lib/verify-uuid.js";
 import { printProperties } from "../lib/print-properties.js";
+import { appendPresignedURL } from "../lib/append-presigned-url.js";
+import { getLooseSketches } from "../db/queries/sketches.js";
 
 export async function handlerGetPages(req: Request, res: Response) {
     const userId = verifyUUID(res.locals.userId);
@@ -47,7 +49,15 @@ export async function handlerGetLoosePages(req: Request, res: Response) {
 
     const loosePageRecords = await getLoosePages(db, userId);
 
+    const looseSketchMetadataRecords = await getLooseSketches(db, userId);
+    const presignedSketchMetadataRecords = await appendPresignedURL(looseSketchMetadataRecords);
+
     printProperties(loosePageRecords, "pageContent");
 
-    res.status(200).json(loosePageRecords);
+    const looseContent = {
+        loosePages: loosePageRecords,
+        looseSketches: presignedSketchMetadataRecords,
+    }
+
+    res.status(200).json(looseContent);
 }

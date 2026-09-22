@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, timestamp, boolean, uniqueIndex } from "drizzle-orm/pg-core"; 
+import { pgTable, uuid, varchar, timestamp, boolean, uniqueIndex, text } from "drizzle-orm/pg-core"; 
 
 export const users = pgTable("users", {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -26,6 +26,15 @@ export const notebooks = pgTable("notebooks", {
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" })
 });
 
+export const sketchMetadata = pgTable("sketch_metadata", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    isChild: boolean("is_child").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+    sketchKey: text("sketch_key").notNull().unique(),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" })
+});
+
 export const pagesToNotebooks = pgTable("pages_to_notebooks", {
     id: uuid("id").primaryKey().defaultRandom(),
     createdAt: timestamp("created_at").defaultNow(),
@@ -48,6 +57,17 @@ export const notebooksToNotebooks = pgTable("notebooks_to_notebooks", {
     (t) => [uniqueIndex("notebooks_of_notebooks").on(t.childNotebookId, t.parentNotebookId)]
 );
 
+export const sketchesToNotebooks = pgTable("sketches_to_notebooks", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+    childSketchId: uuid("child_sketch_id").notNull().references(() => sketchMetadata.id, { onDelete: "cascade" }),
+    parentNotebookId: uuid("parent_notebook_id").notNull().references(() => notebooks.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" })
+},
+    (t) => [uniqueIndex("sketch_of_notebook").on(t.childSketchId, t.parentNotebookId)]
+);
+
 export const refreshTokens = pgTable("refresh_tokens", {
     token: varchar("token").primaryKey().notNull(),
     createdAt: timestamp("created_at").defaultNow(),
@@ -60,6 +80,8 @@ export const refreshTokens = pgTable("refresh_tokens", {
 export type UserRecord = typeof users.$inferInsert;
 export type PageRecord = typeof pages.$inferInsert;
 export type NotebookRecord = typeof notebooks.$inferInsert;
+export type SketchMetadataRecord = typeof sketchMetadata.$inferInsert;
 export type PagesToNotebooksRecord = typeof pagesToNotebooks.$inferInsert;
 export type NotebooksToNotebooksRecord = typeof notebooksToNotebooks.$inferInsert;
+export type SketchesToNotebooksRecord = typeof sketchesToNotebooks.$inferInsert;
 export type RefreshTokenRecord = typeof refreshTokens.$inferInsert;

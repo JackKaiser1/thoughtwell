@@ -23,6 +23,12 @@ import { handlerDeleteNotebook } from "./api/delete-notebook.js";
 import path from "node:path"
 import { fileURLToPath } from "node:url";
 import { config } from "./config.js";
+import { S3Client } from "@aws-sdk/client-s3";
+import { createBucket } from "./lib/create-bucket.js"
+import { handlerCreateSketch } from "./api/create-sketch.js";
+import multer from "multer";
+import { handlerAddSketchesToNotebook } from "./api/add-sketches-notebooks.js";
+import { handlerDeleteSketch } from "./api/delete-sketch.js";
 
 export const app = express();
 const PORT = 8080;
@@ -37,6 +43,36 @@ app.use(cors());
 if (config.mode === "production") {
     app.use("/", express.static(staticPath));
 }
+
+export const s3 = new S3Client({
+    region: "REGION",
+    forcePathStyle: true,
+    credentials: {
+        accessKeyId: config.s3AccessKeyId,
+        secretAccessKey: config.s3SecretAccessKey,
+    },
+    endpoint: "http://minio-db:9000",
+});
+
+export const externalS3 = new S3Client({
+    region: "REGION",
+    forcePathStyle: true,
+    credentials: {
+        accessKeyId: config.s3AccessKeyId,
+        secretAccessKey: config.s3SecretAccessKey,
+    },
+    endpoint: "http://localhost:9000",
+});
+
+
+createBucket(s3, "sketches");
+
+const fileUploadMiddleware = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024,
+    }
+});
 
 
 app.get("/api/readiness", async (req, res, next) => {
@@ -74,6 +110,15 @@ app.delete("/api/pages/:pageId", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerDeletePage(req, res)).catch(next);
 });
 
+
+// sketches
+app.post("/api/sketches", authMiddleware, fileUploadMiddleware.single("sketch"), async (req, res, next) => {
+    Promise.resolve(await handlerCreateSketch(req, res)).catch(next);
+});
+
+app.delete("/api/sketches/:sketchId", authMiddleware, async (req, res, next) => {
+    Promise.resolve(await handlerDeleteSketch(req, res)).catch(next);
+});
 
 
 // users
@@ -119,6 +164,10 @@ app.get("/api/notebooks/all", apiKeyAuthMiddleware, async (req, res, next) => {
 
 app.post("/api/notebooks/addPages", authMiddleware, async (req, res, next) => {
     Promise.resolve(await handlerAddPagesToNotebook(req, res)).catch(next);
+});
+
+app.post("/api/notebooks/addSketches", authMiddleware, async (req, res, next) => {
+    Promise.resolve(await handlerAddSketchesToNotebook(req, res).catch(next));
 });
 
 app.get("/api/notebooks/:notebookId/pages", authMiddleware, async (req, res, next) => {

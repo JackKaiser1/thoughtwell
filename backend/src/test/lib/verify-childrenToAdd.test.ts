@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { rollbackErrorHandler } from "../../lib/query-helpers.js";
 import { db } from "../../db/index.js";
 import { createUser } from "../../db/queries/users.js";
-import { createPage } from "../../db/queries/pages.js";
-import { createNotebook } from "../../db/queries/notebooks.js";
+import { createPage, getPage } from "../../db/queries/pages.js";
+import { createNotebook, getNotebook } from "../../db/queries/notebooks.js";
 import { verifyChildrenToAdd } from "../../lib/verify-childrenToAdd.js";
 import { BadRequestError, UnauthorizedError } from "../../api/errors.js";
 
@@ -35,7 +35,7 @@ describe("verifyChildrenToAdd", () => {
                     childIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
                 };
 
-                const childrenToAdd = await verifyChildrenToAdd(tx, obj, userId);
+                const childrenToAdd = await verifyChildrenToAdd(tx, obj, userId, getPage);
 
                 expect(childrenToAdd.typeOfChild).toEqual("pages");
                 expect(childrenToAdd.userId).toEqual(userRecord.id);
@@ -81,7 +81,7 @@ describe("verifyChildrenToAdd", () => {
                         childIds: [pageRecord.id, pageRecord2.id, pageRecord3.id],
                     };
 
-                    await expect(() => verifyChildrenToAdd(tx, obj, userId)).rejects.toThrow(BadRequestError);
+                    await expect(() => verifyChildrenToAdd(tx, obj, userId, getPage)).rejects.toThrow(BadRequestError);
 
                     tx.rollback();
                 });
@@ -119,7 +119,7 @@ describe("verifyChildrenToAdd", () => {
                     };
     
                     await expect(() => {
-                        return verifyChildrenToAdd(tx, obj, userId)
+                        return verifyChildrenToAdd(tx, obj, userId, getNotebook)
                     }).rejects.toThrow(new BadRequestError("typeOfChild property is incorrect"));
 
     
