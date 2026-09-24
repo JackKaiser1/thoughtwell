@@ -139,11 +139,18 @@ If you wish to contribute to Thoughtwell, the following steps should help get yo
 
 ### Installation - Linux
 
-1. `git clone https://github.com/JackKaiser1/thoughtwell`
+1. ```bash
+   git clone https://github.com/JackKaiser1/thoughtwell
+   ```
 
-2. `cd thoughtwell`
+2. ```bash
+   cd thoughtwell
+   ```
 
-3. `touch .env`
+3. ```bash
+   touch .env
+   ```
+
 
 4. Copy the following keys to the `.env` file and populate them
 
@@ -153,7 +160,14 @@ If you wish to contribute to Thoughtwell, the following steps should help get yo
    POSTGRES_DB=
    SECRET=
    API_KEY=
+   MINIO_ROOT_USER=
+   MINIO_ROOT_PASSWORD=
    MODE=dev
    ```
 
-5. `docker compose up`
+5. ```bash
+   docker compose up
+   ``` 
+
+6.  Open a web browser and connect to `http://localhost:5173`
+
